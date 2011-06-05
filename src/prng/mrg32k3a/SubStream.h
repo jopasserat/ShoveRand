@@ -55,10 +55,10 @@ namespace MRG32k3a {
       /** Init through RngStream
        \param s Stream used as a base for current sub-stream
        */
-      __device__ void init(Stream allStreams[]) {
+      __device__ void init(Stream* allStreams) {
          
          // get stream corresponding to block id
-         Stream* stream  = allStreams + (blockIdx.x * blockDim.x + blockIdx.y);
+         Stream* stream  = allStreams +1;//(gridDim.x * blockIdx.y + blockIdx.x); // seems that params copy fails
          
          // copy stream state in current SubStream
          for (unsigned i = 0; i < 6; ++i) {
@@ -67,7 +67,7 @@ namespace MRG32k3a {
          }
          
          // advance to the SubStream corresponding to thread id IN THE BLOCK
-         this->jumpAhead(threadIdx.x + blockDim.x * threadIdx.y);
+			this->jumpAhead(blockDim.y * blockDim.x * threadIdx.z + blockDim.x * threadIdx.y + threadIdx.x);
       }
       
       

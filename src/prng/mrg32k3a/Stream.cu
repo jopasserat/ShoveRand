@@ -106,12 +106,10 @@ namespace MRG32k3a {
    __host__
    Stream::Stream () {
       
-      /* Information on a stream. The arrays {Cg, Bg, Ig} contain the current
-       state of the stream, the starting state of the current SubStream, and the
-       starting state of the stream. This stream generates antithetic variates
-       if anti = true. It also generates numbers with extended precision (53
-       bits if machine follows IEEE 754 standard) if incPrec = true. nextSeed__
-       will be the seed of the next declared RngStream. */
+      /* Information on a stream. The arrays {Cg, Bg, Ig} contain respecively 
+			the current state of the stream, the starting state of the current 
+			SubStream, and the starting state of the stream. nextSeed__
+			will be the seed of the next declared RngStream. */
       
       for (int i = 0; i < 6; ++i) {
          Bg_[i] = Cg_[i] = Ig_[i] = nextSeed__[i];

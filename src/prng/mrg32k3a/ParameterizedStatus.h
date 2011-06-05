@@ -31,7 +31,7 @@ namespace MRG32k3a {
                                        sizeof(MRG32k3a::Stream) * blocksNumber,
                                        cudaMemcpyHostToDevice) );
 
-            // allocate matrices
+            // allocate and copy from host to device matrices
             cutilSafeCall( cudaMalloc((void**) &A1p76, sizeof(double) * 9) );
             cutilSafeCall( cudaMemcpy(A1p76, A1p76_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
             cutilSafeCall( cudaMalloc((void**) &A2p76, sizeof(double) * 9) );

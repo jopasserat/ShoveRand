@@ -21,13 +21,9 @@ __global__ void testMRG32k3a(double* ddata,  MRG32k3a::ParameterizedStatus* para
 
    // old devices compliant version
 //    MRG32k3a::SubStream* s = allSubStreams + (blockDim.x * blockIdx.x + threadIdx.x);
-//    s->init(allStreams);
-   __syncthreads();
-  
+//    s->init(allStreams);  
  // for (unsigned i = 0; i < 20; ++i) 	s.next();
    
-//     s.Bg_[2] = threadIdx.x;
-//    ddata[blockDim.x * blockIdx.x + threadIdx.x] = s.Bg_[2]; // should not be the equal for all threads!
    ddata[blockDim.x * blockIdx.x + threadIdx.x] = s.next(); // IT WORKS!!!!!
    __syncthreads();
 }
@@ -35,8 +31,8 @@ __global__ void testMRG32k3a(double* ddata,  MRG32k3a::ParameterizedStatus* para
 
 int main(int, char **) {
 
-   int block_num = 1;
-   int thread_num = 512;
+   int block_num = 4;
+   int thread_num = 256;
    int data_size = block_num * thread_num * sizeof(double);
    
    double* d_data;
@@ -67,7 +63,7 @@ int main(int, char **) {
 //    cutilSafeCall( cudaMalloc((void**) &allSubStreams_device, thread_num * block_num * sizeof(MRG32k3a::SubStream)) );
 //    cutilSafeCall( cudaMemcpy(allSubStreams_device, allSubStreams_host, thread_num * block_num * sizeof(MRG32k3a::SubStream), cudaMemcpyHostToDevice) );
 
-   MRG32k3a::ParameterizedStatus*   status_host = new MRG32k3a::ParameterizedStatus(block_num);
+   MRG32k3a::ParameterizedStatus*   status_host = new MRG32k3a::ParameterizedStatus(block_num); // TODO: print out this content to know what the gpu receives
    MRG32k3a::ParameterizedStatus*   status_device;
    cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(MRG32k3a::ParameterizedStatus)) );  
    cutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(MRG32k3a::ParameterizedStatus), cudaMemcpyHostToDevice) );
@@ -80,7 +76,6 @@ int main(int, char **) {
    cudaEventRecord(start, 0);
    
    // kernel call
-//    testMRG32k3a<<< block_num, thread_num >>>(d_data, allSubStreams_device, MRG32k3a::Stream::allStreams);
    testMRG32k3a<<< block_num, thread_num >>>(d_data, status_device);
    
    cudaEventRecord(stop, 0);
