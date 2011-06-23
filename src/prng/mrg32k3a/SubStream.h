@@ -58,7 +58,7 @@ namespace MRG32k3a {
       __device__ void init(Stream* allStreams) {
          
          // get stream corresponding to block id
-         Stream* stream  = allStreams +1;//(gridDim.x * blockIdx.y + blockIdx.x); // seems that params copy fails
+         Stream* stream  = allStreams + (gridDim.x * blockIdx.y + blockIdx.x);
          
          // copy stream state in current SubStream
          for (unsigned i = 0; i < 6; ++i) {

@@ -1,6 +1,7 @@
 
 # Compilers
 CPP   = g++
+CXX   = g++
 NVCC  = nvcc
 
 ARCH  = -arch=compute_20

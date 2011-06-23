@@ -13,6 +13,9 @@
 #include <Stream.h>
 #include <utils.h>
 
+#include <iostream> // debug purpose
+
+
 /******** Host equivalents to device constants *********/
 const double A1p0_host[3][3] = {
    {       0.0,        1.0,       0.0 },
@@ -113,10 +116,10 @@ namespace MRG32k3a {
       
       for (int i = 0; i < 6; ++i) {
          Bg_[i] = Cg_[i] = Ig_[i] = nextSeed__[i];
-      }
-      
-      MatVecModM (A1p127, nextSeed__, nextSeed__, m1);
-      MatVecModM (A2p127, &nextSeed__[3], &nextSeed__[3], m2);
+      } 
+
+      MatVecModM (A1p127_host, nextSeed__, nextSeed__, m1);
+      MatVecModM (A2p127_host, &nextSeed__[3], &nextSeed__[3], m2);
    }
    
    /** Stream constants initializations */
@@ -156,4 +159,23 @@ namespace MRG32k3a {
 //                                  cudaMemcpyHostToDevice) );
 //       
    }
+
+      	std::ostream& operator<< (std::ostream& os, const Stream& s) {
+		os << "Stream <" << &s << ">" << std::endl;
+
+		for (unsigned i = 0; i < 6; ++i)	os << "Cg_[" << i << "] = " << s.Cg_[i] << " ";	
+		os << std::endl;
+		for (unsigned i = 0; i < 6; ++i)	os << "Bg_[" << i << "] = " << s.Bg_[i] << " ";	
+		os << std::endl;
+		for (unsigned i = 0; i < 6; ++i)	os << "Ig_[" << i << "] = " << s.Ig_[i] << " ";	
+		os << std::endl;
+		for (unsigned i = 0; i < 6; ++i)	os << "nextSeed__[" << i << "] = " << Stream::nextSeed__[i] << " ";	
+		os << std::endl;
+
+		return os;
+	}
+
+
 } // end of namespace MRG32k3a
+
+

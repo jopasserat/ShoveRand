@@ -31,8 +31,8 @@ __global__ void testMRG32k3a(double* ddata,  MRG32k3a::ParameterizedStatus* para
 
 int main(int, char **) {
 
-   int block_num = 4;
-   int thread_num = 256;
+   int block_num = 3;
+   int thread_num = 512;
    int data_size = block_num * thread_num * sizeof(double);
    
    double* d_data;
@@ -63,10 +63,15 @@ int main(int, char **) {
 //    cutilSafeCall( cudaMalloc((void**) &allSubStreams_device, thread_num * block_num * sizeof(MRG32k3a::SubStream)) );
 //    cutilSafeCall( cudaMemcpy(allSubStreams_device, allSubStreams_host, thread_num * block_num * sizeof(MRG32k3a::SubStream), cudaMemcpyHostToDevice) );
 
-   MRG32k3a::ParameterizedStatus*   status_host = new MRG32k3a::ParameterizedStatus(block_num); // TODO: print out this content to know what the gpu receives
+   MRG32k3a::ParameterizedStatus*   status_host = new MRG32k3a::ParameterizedStatus(block_num);
    MRG32k3a::ParameterizedStatus*   status_device;
    cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(MRG32k3a::ParameterizedStatus)) );  
    cutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(MRG32k3a::ParameterizedStatus), cudaMemcpyHostToDevice) );
+
+	// each line should be different
+	for (int i = 0; i < block_num; ++i) {
+		std::cout << status_host->allStreams_host[i] << std::endl;
+	}
 
    if (cudaGetLastError() != cudaSuccess) {
       fprintf(stderr, "error has occured before kernel call.\n");
@@ -104,7 +109,7 @@ int main(int, char **) {
    
    
    for (int i = 0; i < block_num * thread_num; ++i) {
-      printf ("h_data[%d] = %lf\n", i, h_data[i]);
+		std::cout << "h_data[" << i << "] = " << h_data[i] << std::endl;
    }
    
    

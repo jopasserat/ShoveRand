@@ -10,6 +10,8 @@
 #ifndef STREAM_H
 #define STREAM_H
 
+#include <iosfwd>
+
 namespace MRG32k3a {
    
    /** Class Stream represents random streams on the host.
@@ -49,14 +51,20 @@ namespace MRG32k3a {
          return Bg_[i];
       }
       
-   private:
+//   private:
+	public:
       double Cg_[6];
       double Bg_[6];
       double Ig_[6];
       
       /** Seed used for the next created stream */
       static double nextSeed__[6];
-      
+
+
+	// TODO: remove this section (debug purpose only)
+	public:
+	friend std::ostream& operator<< (std::ostream&, const Stream&);
+
    };
    
 } // end of namespace MRG32k3a

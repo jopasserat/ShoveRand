@@ -7,6 +7,7 @@ namespace MRG32k3a {
       
       public:
          MRG32k3a::Stream* allStreams_;
+       	MRG32k3a::Stream* allStreams_host;
          
          double* A1p76;
          double* A2p76;
@@ -18,10 +19,11 @@ namespace MRG32k3a {
 
       
       private:
+	//public:
          __host__
          void init(unsigned short blocksNumber) {
             // create streams on the host
-            MRG32k3a::Stream* allStreams_host = new MRG32k3a::Stream [blocksNumber];
+            allStreams_host = new MRG32k3a::Stream [blocksNumber];
       
             // allocate memory for streams on the device
             cutilSafeCall( cudaMalloc( (void**)&allStreams_, sizeof(MRG32k3a::Stream) * blocksNumber) );
