@@ -1,5 +1,5 @@
-/*
- *  uniform_01.hpp
+/** 
+ *  \file uniform_01.hpp
  *  
  *
  *  Created by Jonathan PASSERAT-PALMBACH on 4/14/11.
@@ -23,11 +23,11 @@
 #ifndef SHOVERAND_DISTRIBUTION_UNIFORM_01_HPP
 #define SHOVERAND_DISTRIBUTION_UNIFORM_01_HPP
 
-#include <boost/limits.hpp>
 #include <shoverand/distribution/pass_through_engine.hpp>
 #include <shoverand/distribution/ptr_helper.hpp>
+#include <limits> // replaced Boost's limits with STL's to be portable
 
-namespace boost {
+namespace boost {   
    
    namespace detail {
       
@@ -64,18 +64,23 @@ namespace boost {
          }
          
       };
+
       
-      
-      
+      /** Base use is through variate_generator. Thus, we chose to implement uniform01's
+            new interface only.
+       */
+      // TODO: should this specialization exist?
       template<class UniformRandomNumberGenerator>
       struct select_uniform_01
       {
          template<class RealType>
-         struct apply;
-         //{
-            // commented  by jhacktheripper
+         struct apply {
            // typedef backward_compatible_uniform_01<UniformRandomNumberGenerator, RealType> type;
-           //};
+           // typedef typename select_uniform_01<RealType>:: template apply<RealType>::type type;
+
+            /** Seems to work. Might be useless without backward compatible API. */
+            typedef UniformRandomNumberGenerator type;
+         };
       };
       
       template<>
@@ -135,4 +140,3 @@ namespace boost {
 } // namespace boost
 
 #endif // SHOVERAND_DISTRIBUTION_UNIFORM_01_HPP
-

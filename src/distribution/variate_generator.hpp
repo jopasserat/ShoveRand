@@ -10,7 +10,7 @@
  *  Copyright Jens Maurer 2002
  *  Distributed under the Boost Software License, Version 1.0. (See
  *  accompanying file LICENSE_1_0.txt or copy at
- *  http://www.boost.org/LICENSE_1_0.txt)
+ *  http://www.boost.org/LICENSE_1_0.txt )
  *
  *  See http://www.boost.org for most recent version including documentation.
  *
@@ -22,10 +22,9 @@
 #define SHOVERAND_VARIATE_GENERATOR_HPP
 
 // implementation details
-#include <thrust/random/uniform_int_distribution.h> // TODO recode
-#include <thrust/random/uniform_real_distribution.h> // TODO recode
+#include <shoverand/distribution/uniform_01.hpp>
 #include <shoverand/distribution/pass_through_engine.hpp>
-#include <boost/limits.hpp>
+#include <limits> // replaced Boost's limits with STL's to be portable
 
 namespace boost {
    
@@ -47,8 +46,6 @@ namespace boost {
          };
          
          
-         // following traits seem impossible to implement without modifying thrust
-         /*
          template<>
          struct engine_helper<false, false>
          {
@@ -56,7 +53,8 @@ namespace boost {
             struct impl
             {
                // default uniform real distribution is U01
-               typedef thrust::random::uniform_real_distribution<Engine, DistInputType> type;
+               // typedef thrust::random::uniform_real_distribution<Engine, DistInputType> type;
+               typedef boost::uniform_01<Engine, DistInputType> type;
             };
          };
          
@@ -67,10 +65,13 @@ namespace boost {
             struct impl
             {
                // default uniform real distribution is U01
-               typedef thrust::random::uniform_real_distribution<Engine, DistInputType> type;
+               // typedef thrust::random::uniform_real_distribution<Engine, DistInputType> type;
+               typedef boost::uniform_01<Engine, DistInputType> type;
             };
          };
          
+         // TODO: following traits seem impossible to implement without modifying thrust
+         /*
          template<>
          struct engine_helper<false, true>
          {
@@ -101,6 +102,7 @@ namespace boost {
       
       __host__ __device__
       variate_generator(Engine e, Distribution d)
+      // fucking cast
       : eng_(decorated_engine(e)), dist_(d) { }
 
       __host__ __device__      
@@ -110,7 +112,7 @@ namespace boost {
       __host__ __device__      
       result_type operator()(T value) { return dist_(eng_, value); }
       
-      __host__ __device__      
+      __host__ __device__
       engine_value_type& engine() { return eng_.base().base(); }
       
       __host__ __device__      
