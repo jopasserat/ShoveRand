@@ -15,14 +15,13 @@
 // __global__ void testMRG32k3a(double* ddata,  MRG32k3a::SubStream allSubStreams[], MRG32k3a::Stream allStreams[]) {
 __global__ void testMRG32k3a(double* ddata,  MRG32k3a::ParameterizedStatus* param) {
 
-  // this call could not work with devices of
-  // compute capability < 2.x
-  MRG32k3a::SubStream s(param);
+	// this call could not work with devices of
+	// compute capability < 2.x
+	MRG32k3a::SubStream s(param);
 
    // old devices compliant version
 //    MRG32k3a::SubStream* s = allSubStreams + (blockDim.x * blockIdx.x + threadIdx.x);
-//    s->init(allStreams);  
- // for (unsigned i = 0; i < 20; ++i) 	s.next();
+//    s->init(allStreams);
    
    ddata[blockDim.x * blockIdx.x + threadIdx.x] = s.next(); // IT WORKS!!!!!
    __syncthreads();
@@ -68,10 +67,6 @@ int main(int, char **) {
    cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(MRG32k3a::ParameterizedStatus)) );  
    cutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(MRG32k3a::ParameterizedStatus), cudaMemcpyHostToDevice) );
 
-	// each line should be different
-	for (int i = 0; i < block_num; ++i) {
-		std::cout << status_host->allStreams_host[i] << std::endl;
-	}
 
    if (cudaGetLastError() != cudaSuccess) {
       fprintf(stderr, "error has occured before kernel call.\n");
@@ -93,7 +88,7 @@ int main(int, char **) {
    }
    
    // allocate memory to get results back on the host
-   h_data = (double *) malloc(data_size);
+   h_data = new double[data_size];
    
    if (h_data == NULL) {
       fprintf(stderr, "failure in allocating host memory for output data.\n");
@@ -121,7 +116,10 @@ int main(int, char **) {
    cudaEventDestroy(start);
    cudaEventDestroy(stop);
    
-   free(h_data);
+   delete [] h_data;
    cutilSafeCall(cudaFree(d_data));
+
+	cutilSafeCall(cudaFree(status_device));
+	delete status_host;
    
 }

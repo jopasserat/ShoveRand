@@ -1,6 +1,7 @@
 #ifndef MRG32K3A_PARAMETERIZED_STATUS
 #define MRG32K3A_PARAMETERIZED_STATUS
 
+
 namespace MRG32k3a {
 
    class ParameterizedStatus {
@@ -55,6 +56,19 @@ namespace MRG32k3a {
             this->init(blocksNumber);
          }
       
+			__host__
+			~ParameterizedStatus() {
+				cutilSafeCall( cudaFree(A2_pows) );
+				cutilSafeCall( cudaFree(A1_pows) );
+				cutilSafeCall( cudaFree(A2p127) );
+				cutilSafeCall( cudaFree(A1p127) );
+				cutilSafeCall( cudaFree(A2p76) );
+				cutilSafeCall( cudaFree(A1p76) );
+				cutilSafeCall( cudaFree(allStreams_) );
+				
+				delete [] allStreams_host;
+			};
+				
    };
   
   
