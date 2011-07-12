@@ -23,24 +23,7 @@ namespace MRG32k3a {
       
       /** Stream class default constructor */
       __host__ explicit Stream();
-      
-      /** Stream constants initializations
-         \param blocksNumber Number of blocks in the considered kernel: will
-                           be equivalent to the number of created Streams.
-       */
-      __host__ static void init(unsigned int blocksNumber);
-      
-      /** Free memory on both sides */
-      __host__ static void destroy();
-      
-      // static members
-      
-      /* Global Streams that will serve as a base from sub-streams (device side) */
-      static Stream* allStreams;
-      
-      /** Global Streams that will serve as a base from sub-streams (host equivalent) */
-      static Stream* allStreams_host;
-      
+     
       // getters
       
       __host__ __device__ inline double getCg(unsigned i) const {
@@ -59,11 +42,6 @@ namespace MRG32k3a {
       
       /** Seed used for the next created stream */
       static double nextSeed__[6];
-
-
-	// TODO: remove this section (debug purpose only)
-	public:
-	friend std::ostream& operator<< (std::ostream&, const Stream&);
 
    };
    

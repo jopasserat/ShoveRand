@@ -83,10 +83,6 @@ const double A2_pows_host [11][3][3] = {
 
 
 
-// static members instanciation
-MRG32k3a::Stream* MRG32k3a::Stream::allStreams_host;
-MRG32k3a::Stream* MRG32k3a::Stream::allStreams;
-
 namespace MRG32k3a {
    
    //*************************************************************************
@@ -121,61 +117,5 @@ namespace MRG32k3a {
       MatVecModM (A1p127_host, nextSeed__, nextSeed__, m1);
       MatVecModM (A2p127_host, &nextSeed__[3], &nextSeed__[3], m2);
    }
-   
-   /** Stream constants initializations */
-   __host__ 
-   void Stream::init(unsigned int blocksNumber) {
-   
-//       // copies to constant memory
-// //       cutilSafeCall( cudaMemcpyToSymbol(A1p0, A1p0_host, sizeof(double) * 9) );
-// //       cutilSafeCall( cudaMemcpyToSymbol(A2p0, A2p0_host, sizeof(double) * 9) );
-// //       cutilSafeCall( cudaMemcpyToSymbol(A1p76, A1p76_host, sizeof(double) * 9) );
-// //       cutilSafeCall( cudaMemcpyToSymbol(A2p76, A2p76_host, sizeof(double) * 9) );
-//          
-//          cutilSafeCall( cudaMalloc(&A2p76, sizeof(double) * 9) );
-//          cutilSafeCall( cudaMemcpy(A2p76, A2p76_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
-//          cutilSafeCall( cudaMemcpyToSymbol(A2p76_adress, &A2p76, sizeof(double**)));
-// 
-// //       cutilSafeCall( cudaMemcpyToSymbol(A1p127, A1p127_host, sizeof(double) * 9) );
-// //       cutilSafeCall( cudaMemcpyToSymbol(A2p127, A2p127_host, sizeof(double) * 9) );
-// //       
-// //       cutilSafeCall( cudaMemcpyToSymbol(A1_pows, A1_pows_host, sizeof(double) * 11 * 3 * 3) );
-// //       cutilSafeCall( cudaMemcpyToSymbol(A2_pows, A2_pows_host, sizeof(double) * 11 * 3 * 3) );
-// 
-//          cutilSafeCall( cudaMalloc(&A2_pows, sizeof(double) * 11 * 3 * 3) );
-//          cutilSafeCall( cudaMemcpy(A2_pows, A2_pows_host, sizeof(double) * 11 * 3 * 3, cudaMemcpyHostToDevice ) );
-//          cutilSafeCall( cudaMemcpyToSymbol(A2_pows_adress, &A2_pows_adress, sizeof(double***)));
-// 
-//       // create streams on the host
-//       Stream::allStreams_host = new Stream[blocksNumber];
-//       
-//       // allocate memory for streams on the device
-//       cutilSafeCall( cudaMalloc( (void**)&Stream::allStreams, sizeof(Stream) * blocksNumber) );
-//       
-//       // transfer Streams 
-//       cutilSafeCall( cudaMemcpy( Stream::allStreams,
-//                                  Stream::allStreams_host,
-//                                  sizeof(Stream) * blocksNumber,
-//                                  cudaMemcpyHostToDevice) );
-//       
-   }
-
-      	std::ostream& operator<< (std::ostream& os, const Stream& s) {
-		os << "Stream <" << &s << ">" << std::endl;
-
-		for (unsigned i = 0; i < 6; ++i)	os << "Cg_[" << i << "] = " << s.Cg_[i] << " ";	
-		os << std::endl;
-		for (unsigned i = 0; i < 6; ++i)	os << "Bg_[" << i << "] = " << s.Bg_[i] << " ";	
-		os << std::endl;
-		for (unsigned i = 0; i < 6; ++i)	os << "Ig_[" << i << "] = " << s.Ig_[i] << " ";	
-		os << std::endl;
-		for (unsigned i = 0; i < 6; ++i)	os << "nextSeed__[" << i << "] = " << Stream::nextSeed__[i] << " ";	
-		os << std::endl;
-
-		return os;
-	}
-
 
 } // end of namespace MRG32k3a
-
-

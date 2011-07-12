@@ -16,8 +16,6 @@
 #define SUBSTREAM_H
 
 
-// #include <Stream.h>
-// #include <utils.h>
 #include <cmath>
 
 namespace MRG32k3a {
@@ -124,7 +122,6 @@ namespace MRG32k3a {
          };
          
 
-     //   MyMatPowModM(A1_pN, A2_pN, pow); // does not work
          MatPowModM(params_->A1p76, A1_pN, m1, pow);  // (A1^(2^76))^n mod m
          MatPowModM(params_->A2p76, A2_pN, m2, pow);  // (A2^(2^76))^n mod m
          
@@ -132,7 +129,6 @@ namespace MRG32k3a {
         MatVecModM(A2_pN, &Bg_[3], &Bg_[3], m2);
          
         for (unsigned i = 0; i < 6; ++i) {
-//             Cg_[i] = Bg_[i] = A2_pN[2][0];
            Cg_[i] = Bg_[i];
         }
       }
@@ -158,33 +154,6 @@ namespace MRG32k3a {
          }
          for (i = 0; i < 3; ++i)
             v[i] = x[i];
-      }
-      
-      /** Raise matrices to given power using a quick exponentiation 
-      algorithm.
-      \param A1 A1 matrix to be raised to given power
-      \param A2 A2 matrix to be raised to given power
-      \param pow Power to raise both matrices to
-      */
-      __device__
-      void MyMatPowModM (double A1[3][3],  double A2[3][3], long pow) {
-         int i = 0;
-         
-         
-         // figure out which of the precomputed matrices need to be used 
-         // (stored from indice 1 to 10 in arrays)
-         // if a power is not needed array[0] is reached, that is
-         // identity
-         while (i < 11) {
-      //       MatMatModM(A1p76, A1_pows[i & (pow >> i)], A1, m1);
-      //       MatMatModM_device(A2p76_device, A2_pows_device[i & (pow >> i)], A2, m2);
-             MatMatModM_device(params_->A1p76, params_->A1_pows + ((i & (pow >> i)) * 9), A1, m1);
-             MatMatModM_device(params_->A2p76, params_->A2_pows + ((i & (pow >> i)) * 9), A2, m2);
-//             A2[2][0] = (params_->A1_pows)[1 & (pow >> 1) + 12 + 0];
-      //       A2[1][0] = params_->A2_pows[1 & (pow >> 1)][0][0]; // constant memory bug?? 
-                                                         // MatMatModM bug ??
-            ++i;
-         }
       }
       
    };
