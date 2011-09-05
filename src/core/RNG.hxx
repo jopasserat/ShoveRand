@@ -21,6 +21,13 @@ class RNG : public Algo<T> {
    
 public:
 	
+	__device__
+	RNG ( ParameterizedStatus<Algo >* ps)
+		:Algo<T>(ps) 
+	{}
+	
+	typedef typename Algo<T>::ParameterizedStatusType ParameterizedStatusType;
+	
    // declare that class RNG models the Algorithm concept
 	BOOST_CONCEPT_ASSERT((RNGAlgorithm< T, Algo >));
    

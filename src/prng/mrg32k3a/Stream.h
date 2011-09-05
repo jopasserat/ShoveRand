@@ -22,8 +22,10 @@ namespace MRG32k3a {
    public:
       
       /** Stream class default constructor */
-      __host__ explicit Stream();
-     
+      __host__
+      explicit Stream();
+
+
       // getters
       
       __host__ __device__ inline double getCg(unsigned i) const {

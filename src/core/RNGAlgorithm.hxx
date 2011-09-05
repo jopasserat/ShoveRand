@@ -26,7 +26,7 @@ private:
 	Algo<T> al_;
    T value_;
    SeedStatus< Algo > ss_;
-   ParameterizedStatus< Algo > ps_;
+   ParameterizedStatus< Algo >* ps_;
    
    
 private:

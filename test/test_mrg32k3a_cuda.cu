@@ -2,6 +2,8 @@
 #include <ParameterizedStatus.h>
 #include <SubStream.h>
 
+#include <MRG32k3a.hxx>
+
 #include <cstdio>
 #include <cstdlib>
 #include <cerrno>
@@ -12,18 +14,25 @@
 #include <cutil_inline_runtime.h>
 
 
-// __global__ void testMRG32k3a(double* ddata,  MRG32k3a::SubStream allSubStreams[], MRG32k3a::Stream allStreams[]) {
-__global__ void testMRG32k3a(double* ddata,  MRG32k3a::ParameterizedStatus* param) {
+// shortcut :)
+typedef RNG< float, MRG32k3a::MRG32k3a > ::ParameterizedStatusType ParameterizedStatusType;
+
+
+__global__ void testMRG32k3a(double* ddata,  ParameterizedStatusType* param) {
 
 	// this call could not work with devices of
 	// compute capability < 2.x
-	MRG32k3a::SubStream s(param);
+	//MRG32k3a::SubStream s(param);
+
+	RNG < float, MRG32k3a::MRG32k3a > 	rng(param);
+	rng.init();
 
    // old devices compliant version
 //    MRG32k3a::SubStream* s = allSubStreams + (blockDim.x * blockIdx.x + threadIdx.x);
 //    s->init(allStreams);
    
-   ddata[blockDim.x * blockIdx.x + threadIdx.x] = s.next(); // IT WORKS!!!!!
+  // ddata[blockDim.x * blockIdx.x + threadIdx.x] = s.next(); // IT WORKS!!!!!
+	ddata[blockDim.x * blockIdx.x + threadIdx.x] = rng.next(); // IT WORKS!!!!!
    __syncthreads();
 }
 
@@ -39,12 +48,6 @@ int main(int, char **) {
    cudaError_t e;
    float gputime;
    
-   
-   // create Streams for all threads
-//    MRG32k3a::Stream::init(block_num);
-//    MRG32k3a::SubStream* allSubStreams_host = new MRG32k3a::SubStream[thread_num * block_num];
-//    MRG32k3a::SubStream* allSubStreams_device;
-//    
    // create timers 
    cudaEvent_t start;
    cudaEvent_t stop;
@@ -55,17 +58,14 @@ int main(int, char **) {
    // allocate memory for data on device
    cutilSafeCall( cudaMalloc((void**) &d_data, data_size) );
    cutilSafeCall( cudaMemset(d_data, 0, data_size) );
- 
 
-//   allSubStreams_host = (MRG32k3a::SubStream*)malloc(thread_num * block_num * sizeof(MRG32k3a::SubStream));
 
-//    cutilSafeCall( cudaMalloc((void**) &allSubStreams_device, thread_num * block_num * sizeof(MRG32k3a::SubStream)) );
-//    cutilSafeCall( cudaMemcpy(allSubStreams_device, allSubStreams_host, thread_num * block_num * sizeof(MRG32k3a::SubStream), cudaMemcpyHostToDevice) );
 
-   MRG32k3a::ParameterizedStatus*   status_host = new MRG32k3a::ParameterizedStatus(block_num);
-   MRG32k3a::ParameterizedStatus*   status_device;
-   cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(MRG32k3a::ParameterizedStatus)) );  
-   cutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(MRG32k3a::ParameterizedStatus), cudaMemcpyHostToDevice) );
+	ParameterizedStatusType* 	 status_host = new MRG32k3a::ParameterizedStatusMRG32k3a(); // TODO change by builder method
+	status_host->setUp(block_num);
+   ParameterizedStatusType*    status_device;
+   cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(ParameterizedStatusType)) );  
+   cutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(ParameterizedStatusType), cudaMemcpyHostToDevice) );
 
 
    if (cudaGetLastError() != cudaSuccess) {
@@ -75,6 +75,7 @@ int main(int, char **) {
    
    cudaEventRecord(start, 0);
    
+
    // kernel call
    testMRG32k3a<<< block_num, thread_num >>>(d_data, status_device);
    

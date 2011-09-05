@@ -22,38 +22,39 @@ namespace MRG32k3a {
    
    
    class SubStream {
+		
+	private:
+		typedef ::MRG32k3a::ParameterizedStatusMRG32k3a ParameterizedStatus;
+		
    public:
       /** Current sub-stream state */
-      double Cg_[6]; 
+      double Cg_[6];
       
       /** Starting state of the current sub-stream */
       double Bg_[6];
       
-      MRG32k3a::ParameterizedStatus* params_;
+      ParameterizedStatus* params_;
       
    public:
-      
-      /** Default constructor. */
-      __host__ SubStream() {
-         // nothing to do
-      }
+
       
       /** Constructor based on the Streams array. 
           Calls init with the array as parameter.
           \param streams Stream array to init the current SubStream
       */
-      __device__ SubStream(MRG32k3a::ParameterizedStatus* param)
+      __device__ 
+      SubStream(ParameterizedStatus* param)
          :params_(param)
       {
-         
          this->init(params_->allStreams_);
       }
-      
+       
       
       /** Init through RngStream
        \param s Stream used as a base for current sub-stream
        */
-      __device__ void init(Stream* allStreams) {
+      __device__
+      void init(Stream* allStreams) {
          
          // get stream corresponding to block id
          Stream* stream  = allStreams + (gridDim.x * blockIdx.y + blockIdx.x);
@@ -70,7 +71,8 @@ namespace MRG32k3a {
       
       
       /** Draw next number */
-      __device__ double next() {
+      __host__ __device__
+      double next() {
          
          long k;
          double p1, p2, u;
@@ -125,12 +127,12 @@ namespace MRG32k3a {
          MatPowModM(params_->A1p76, A1_pN, m1, pow);  // (A1^(2^76))^n mod m
          MatPowModM(params_->A2p76, A2_pN, m2, pow);  // (A2^(2^76))^n mod m
          
-        MatVecModM(A1_pN, Bg_, Bg_, m1);
-        MatVecModM(A2_pN, &Bg_[3], &Bg_[3], m2);
+         MatVecModM(A1_pN, Bg_, Bg_, m1);
+         MatVecModM(A2_pN, &Bg_[3], &Bg_[3], m2);
          
-        for (unsigned i = 0; i < 6; ++i) {
-           Cg_[i] = Bg_[i];
-        }
+         for (unsigned i = 0; i < 6; ++i) {
+            Cg_[i] = Bg_[i];
+         }
       }
      
    private:
