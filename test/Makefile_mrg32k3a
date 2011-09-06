@@ -23,10 +23,12 @@ EXEC= test-mrg32k3a
 
 .SUFFIXES:	.cu .cubin .ptx .bin
 
+OBJS= ../src/prng/mrg32k3a/ParameterizedStatus.o
+
 all: $(EXEC)
 
 test-mrg32k3a:	test_mrg32k3a_cuda.o 
-	${CPP} $^ -o $@ ${CUTILLIB} -L ${CUDALIB} -lcuda -lcudart
+	${CPP} $^ -o $@ $(OBJS) ${CUTILLIB} -L ${CUDALIB} -lcuda -lcudart
 
 # Compilation rules
 %o: %cpp

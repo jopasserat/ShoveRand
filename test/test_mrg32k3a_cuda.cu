@@ -1,4 +1,4 @@
-#include <Stream.cu>
+// #include <Stream.cu> // already included by ParameterizedStatus.h
 #include <ParameterizedStatus.h>
 #include <SubStream.h>
 #include <MRG32k3a.hxx>
@@ -12,8 +12,10 @@
 
 #include <iostream> // debug purposes
 
-// shortcut :)
+// shortcuts :)
+using shoverand::prng::core::RNG;
 typedef RNG< float, MRG32k3a::MRG32k3a > ::ParameterizedStatusType ParameterizedStatusType;
+
 
 
 __global__ void testMRG32k3a(double* ddata,  ParameterizedStatusType* param) {

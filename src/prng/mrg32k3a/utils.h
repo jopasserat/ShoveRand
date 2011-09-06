@@ -34,6 +34,12 @@
 
 namespace shoverand {
 	namespace utils {
+		
+		/** This structure owns static methods implied in random number computation.
+		 * They are basically dedicated to matrix calculi.
+		 * 
+		 * \author jH@CKtheRipper
+		 */
 		struct Math {
 			
 			/**
