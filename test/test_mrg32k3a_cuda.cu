@@ -1,18 +1,16 @@
 #include <Stream.cu>
 #include <ParameterizedStatus.h>
 #include <SubStream.h>
-
 #include <MRG32k3a.hxx>
 
-#include <cstdio>
 #include <cstdlib>
-#include <cerrno>
-
 
 #include <cuda.h>
 #include <cutil.h>
 #include <cutil_inline_runtime.h>
 
+
+#include <iostream> // debug purposes
 
 // shortcut :)
 typedef RNG< float, MRG32k3a::MRG32k3a > ::ParameterizedStatusType ParameterizedStatusType;
@@ -31,7 +29,6 @@ __global__ void testMRG32k3a(double* ddata,  ParameterizedStatusType* param) {
 //    MRG32k3a::SubStream* s = allSubStreams + (blockDim.x * blockIdx.x + threadIdx.x);
 //    s->init(allStreams);
    
-  // ddata[blockDim.x * blockIdx.x + threadIdx.x] = s.next(); // IT WORKS!!!!!
 	ddata[blockDim.x * blockIdx.x + threadIdx.x] = rng.next(); // IT WORKS!!!!!
    __syncthreads();
 }
@@ -61,7 +58,7 @@ int main(int, char **) {
 
 
 
-	ParameterizedStatusType* 	 status_host = new MRG32k3a::ParameterizedStatusMRG32k3a(); // TODO change by builder method
+	ParameterizedStatusType* 	 status_host = new MRG32k3a::ParameterizedStatusMRG32k3a(); // TODO change to builder method
 	status_host->setUp(block_num);
    ParameterizedStatusType*    status_device;
    cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(ParameterizedStatusType)) );  
@@ -69,7 +66,7 @@ int main(int, char **) {
 
 
    if (cudaGetLastError() != cudaSuccess) {
-      fprintf(stderr, "error has occured before kernel call.\n");
+      std::cerr << "error has occured before kernel call." << std::endl;
       exit(1);
    }
    
@@ -84,7 +81,7 @@ int main(int, char **) {
    
    e = cudaGetLastError();
    if (e != cudaSuccess) {
-      fprintf(stderr, "failure in kernel call.\n%s\n", cudaGetErrorString(e));
+      std::cerr << "failure in kernel call.\n" << cudaGetErrorString(e) << std::endl;
       exit(2);
    }
    
@@ -92,7 +89,7 @@ int main(int, char **) {
    h_data = new double[data_size];
    
    if (h_data == NULL) {
-      fprintf(stderr, "failure in allocating host memory for output data.\n");
+      std::cerr << "failure in allocating host memory for output data." << std::endl;
       exit(3);
    }
    
@@ -109,9 +106,9 @@ int main(int, char **) {
    }
    
    
-   printf("generated numbers: %d\n", thread_num * block_num);
-   printf("Processing time: %f (ms)\n", gputime);
-   printf("Samples per second: %E \n", (thread_num * block_num) / (gputime * 0.001));
+   std::cout << "generated numbers: " << thread_num * block_num << std::endl;
+   std::cout << "Processing time: " << gputime << " (ms)" << std::endl;
+   std::cout << "Samples per second: " << (thread_num * block_num) / (gputime * 0.001) << std::endl; 
    
    //free memories
    cudaEventDestroy(start);

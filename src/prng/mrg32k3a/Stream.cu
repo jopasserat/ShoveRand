@@ -6,15 +6,12 @@
 	\***********************************************************************/
 
 
-	#include <cuda.h>
-	#include <cutil.h>
-	#include <cutil_inline_runtime.h>
+#include <cuda.h>
+#include <cutil.h>
+#include <cutil_inline_runtime.h>
 
-	#include <Stream.h>
-	#include <utils.h>
-
-	#include <iostream> // debug purpose
-
+#include <Stream.h>
+#include <utils.h>
 
 
 namespace MRG32k3a {
@@ -117,8 +114,8 @@ namespace MRG32k3a {
 			Bg_[i] = Cg_[i] = Ig_[i] = nextSeed__[i];
 		}
 
-		MatVecModM (A1p127_host, nextSeed__, nextSeed__, m1);
-		MatVecModM (A2p127_host, &nextSeed__[3], &nextSeed__[3], m2);
+		shoverand::utils::Math::MatVecModM (A1p127_host, nextSeed__, nextSeed__, m1);
+		shoverand::utils::Math::MatVecModM (A2p127_host, &nextSeed__[3], &nextSeed__[3], m2);
 
 	}
 

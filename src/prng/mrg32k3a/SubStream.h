@@ -16,7 +16,7 @@
 #define SUBSTREAM_H
 
 
-#include <cmath>
+#include <utils.h>
 
 namespace MRG32k3a {
    
@@ -77,11 +77,9 @@ namespace MRG32k3a {
          long k;
          double p1, p2, u;
          
-         // changed static_casts to regular casts due to cuda
-         
          // Component 1
          p1 = a12 * Cg_[1] - a13n * Cg_[0];
-         k = (long) (p1 / m1);
+         k = static_cast<long> (p1 / m1);
          p1 -= k * m1;
          
          if (p1 < 0.0)  p1 += m1;
@@ -90,7 +88,7 @@ namespace MRG32k3a {
          
          // Component 2
          p2 = a21 * Cg_[5] - a23n * Cg_[3];
-         k = (long) (p2 / m2);
+         k = static_cast<long> (p2 / m2);
          p2 -= k * m2;
          
          if (p2 < 0.0) p2 += m2;
@@ -103,7 +101,9 @@ namespace MRG32k3a {
          return u;
       }
       
-      
+    
+	private:
+		
       /** Jump n SubStreams ahead in current stream
        \param pow Number of sub-streams to jump
        */
@@ -124,38 +124,15 @@ namespace MRG32k3a {
          };
          
 
-         MatPowModM(params_->A1p76, A1_pN, m1, pow);  // (A1^(2^76))^n mod m
-         MatPowModM(params_->A2p76, A2_pN, m2, pow);  // (A2^(2^76))^n mod m
+         shoverand::utils::Math::MatPowModM(params_->A1p76, A1_pN, m1, pow);  // (A1^(2^76))^n mod m
+         shoverand::utils::Math::MatPowModM(params_->A2p76, A2_pN, m2, pow);  // (A2^(2^76))^n mod m
          
-         MatVecModM(A1_pN, Bg_, Bg_, m1);
-         MatVecModM(A2_pN, &Bg_[3], &Bg_[3], m2);
+         shoverand::utils::Math::MatVecModM(A1_pN, Bg_, Bg_, m1);
+         shoverand::utils::Math::MatVecModM(A2_pN, &Bg_[3], &Bg_[3], m2);
          
          for (unsigned i = 0; i < 6; ++i) {
             Cg_[i] = Bg_[i];
          }
-      }
-     
-   private:
-      
-      /**
-      * Compute the vector v = A*s MOD m. Assume that -m < s[i] < m.
-      * Works also when v = s.
-      *  \author Pierre L'Ecuyer
-      */
-      __device__
-      void MatVecModM (double A[3][3], double s[3], double v[3],
-                     double m)
-      {
-         int i;
-         double x[3];               // Necessary if v = s
-         
-         for (i = 0; i < 3; ++i) {
-            x[i] = MultModM (A[i][0], s[0], 0.0, m);
-            x[i] = MultModM (A[i][1], s[1], x[i], m);
-            x[i] = MultModM (A[i][2], s[2], x[i], m);
-         }
-         for (i = 0; i < 3; ++i)
-            v[i] = x[i];
       }
       
    };
