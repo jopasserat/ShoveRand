@@ -13,7 +13,7 @@
 
 #include <shoverand/core/SeedStatus.hxx>
 //#include <shoverand/prng/mrg32k3a/Stream.cu>
-#include <shoverand/prng/mrg32k3a/SubStream.h>
+#include <shoverand/prng/mrg32k3a/SubStream.h> // TODO shouldn't be included here
 
 #include <shoverand/prng/mrg32k3a/ParameterizedStatus.h>
 #include <shoverand/prng/mrg32k3a/SeedStatus.h>

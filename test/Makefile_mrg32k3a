@@ -23,7 +23,7 @@ EXEC= test-mrg32k3a
 
 .SUFFIXES:	.cu .cubin .ptx .bin
 
-OBJS= ../src/prng/mrg32k3a/ParameterizedStatus.o
+OBJS= ../src/prng/mrg32k3a/*.o
 
 all: $(EXEC)
 

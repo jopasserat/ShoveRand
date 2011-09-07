@@ -37,12 +37,26 @@ using namespace shoverand::prng;
 
          double* A1_pows;
          double* A2_pows;
+			
+			// following array are static to allow to initialization of const values
+			static const double A1p0_host[3][3];
+			static const double A2p0_host[3][3];
+			static const double A1p76_host[3][3];
+			static const double A2p76_host[3][3];
+			static const double A1p127_host[3][3];
+			static const double A2p127_host[3][3];
+			
+			static const double A1_pows_host[11][3][3];
+			static const double A2_pows_host[11][3][3];
+
 
 	public:
 		
 			// TODO find a way to default construct correctly
          __host__
          ParameterizedStatus<MRG32k3a::MRG32k3a>() {
+				
+				
          }
 		
          __host__
@@ -53,6 +67,7 @@ using namespace shoverand::prng;
 				
    };
 
+	
 
 namespace shoverand {
 	namespace prng {	
