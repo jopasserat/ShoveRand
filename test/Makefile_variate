@@ -28,7 +28,8 @@ CUDALIB = ${CUDA_HOME}/lib64
 CUDALINK= -lcuda -lcudart
 
 CORE_INCLUDES= ../src/core
-MRG32K3A_INCLUDES= ../src/prng/mrg32k3a
+#MRG32K3A_INCLUDES= ../src/prng/mrg32k3a
+MRG32K3A_INCLUDES= ..
 
 # compilers flags
 WARN = -Wmissing-prototypes -Wall -Wextra
@@ -37,13 +38,13 @@ CPPFLAGS= $(WARN) $(OPTI)
 CFLAGS= $(OPTI) $(WARN) $(STD)
 NVCC_FLAGS= $(ARCH) --compiler-options '-Wall'
 
-EXEC= test-shoverand
+EXEC= test-variate
 
 .SUFFIXES:	.cu .cubin .ptx .bin
 
 all: $(EXEC)
 
-test-shoverand:	main.o 
+test-variate:	test_variate.o 
 	${CPP} $^ -o $@ ${CUTILLIB} -L${CUDALIB}  ${CUDALINK}
 
 %.cpp: %.cu
