@@ -6,7 +6,9 @@
 
 
 // TODO is there a way to declare const arrays as extern?
-#include "Stream.cu"
+//#include "Stream.cu"
+
+
 
 __host__
 void ParameterizedStatus<MRG32k3a::MRG32k3a>::setUp (unsigned short blocksNumber) {

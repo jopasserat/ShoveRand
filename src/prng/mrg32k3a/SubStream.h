@@ -31,10 +31,7 @@ namespace shoverand {
 			public:
 				/** Current sub-stream state */
 				double Cg_[6];
-				
-				/** Starting state of the current sub-stream */
-				double Bg_[6];
-				
+	
 				ParameterizedStatus* params_;
 				
 			public:
@@ -64,7 +61,6 @@ namespace shoverand {
 					// copy stream state in current SubStream
 					for (unsigned i = 0; i < 6; ++i) {
 						Cg_[i] = stream->getCg(i);
-						Bg_[i] = stream->getBg(i);
 					}
 					
 					// advance to the SubStream corresponding to thread id IN THE BLOCK
@@ -129,12 +125,9 @@ namespace shoverand {
 					shoverand::utils::Math::MatPowModM(params_->A1p76, A1_pN, m1, pow);  // (A1^(2^76))^n mod m
 					shoverand::utils::Math::MatPowModM(params_->A2p76, A2_pN, m2, pow);  // (A2^(2^76))^n mod m
 					
-					shoverand::utils::Math::MatVecModM(A1_pN, Bg_, Bg_, m1);
-					shoverand::utils::Math::MatVecModM(A2_pN, &Bg_[3], &Bg_[3], m2);
-					
-					for (unsigned i = 0; i < 6; ++i) {
-						Cg_[i] = Bg_[i];
-					}
+					shoverand::utils::Math::MatVecModM(A1_pN, Cg_, Cg_, m1);
+					shoverand::utils::Math::MatVecModM(A2_pN, &Cg_[3], &Cg_[3], m2);
+
 				}
 				
 			};

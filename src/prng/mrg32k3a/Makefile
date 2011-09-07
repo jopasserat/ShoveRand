@@ -26,9 +26,6 @@ EXEC= test-mrg32k3a
 all: *.o
 
 # Compilation rules
-%.o: %cpp
-	$(CPP) -c $< $(CPP_FLAGS)
-
 %.o: %.cu
 	$(NVCC) -c -I. -I ../../.. $< $(NVCC_FLAGS) $(ARCH) $(CUDAINCL) $(CUDASDKINCL)
 
