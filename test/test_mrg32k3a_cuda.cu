@@ -1,7 +1,6 @@
-// #include <Stream.cu> // already included by ParameterizedStatus.h
-#include <ParameterizedStatus.h>
-#include <SubStream.h>
-#include <MRG32k3a.hxx>
+#include <shoverand/prng/mrg32k3a/ParameterizedStatus.h>
+#include <shoverand/prng/mrg32k3a/MRG32k3a.hxx>
+#include <shoverand/core/RNG.hxx>
 
 #include <cstdlib>
 
@@ -13,25 +12,22 @@
 #include <iostream> // debug purposes
 
 // shortcuts :)
-using shoverand::prng::core::RNG;
-typedef RNG< float, MRG32k3a::MRG32k3a > ::ParameterizedStatusType ParameterizedStatusType;
+using shoverand::RNG;
+using shoverand::MRG32k3a;
+typedef RNG< float, MRG32k3a > ::ParameterizedStatusType ParameterizedStatusType;
 
 
 
 __global__ void testMRG32k3a(double* ddata,  ParameterizedStatusType* param) {
 
-	// this call could not work with devices of
+	// this call might not work with devices of
 	// compute capability < 2.x
-	//MRG32k3a::SubStream s(param);
-
-	RNG < float, MRG32k3a::MRG32k3a > 	rng(param);
+	RNG < float, MRG32k3a > 	rng(param);
 	rng.init();
 
-   // old devices compliant version
-//    MRG32k3a::SubStream* s = allSubStreams + (blockDim.x * blockIdx.x + threadIdx.x);
-//    s->init(allStreams);
+   // TODO old devices compliant version
    
-	ddata[blockDim.x * blockIdx.x + threadIdx.x] = rng.next(); // IT WORKS!!!!!
+	ddata[blockDim.x * blockIdx.x + threadIdx.x] = rng.next();
    __syncthreads();
 }
 
@@ -59,9 +55,10 @@ int main(int, char **) {
    cutilSafeCall( cudaMemset(d_data, 0, data_size) );
 
 
-
-	ParameterizedStatusType* 	 status_host = new MRG32k3a::ParameterizedStatusMRG32k3a(); // TODO change to builder method
+	// ParameterizedStatus initialization on both sides
+	ParameterizedStatusType* 	 status_host = new ParameterizedStatusType(); // TODO maybe change to builder method
 	status_host->setUp(block_num);
+
    ParameterizedStatusType*    status_device;
    cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(ParameterizedStatusType)) );  
    cutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(ParameterizedStatusType), cudaMemcpyHostToDevice) );
@@ -112,7 +109,7 @@ int main(int, char **) {
    std::cout << "Processing time: " << gputime << " (ms)" << std::endl;
    std::cout << "Samples per second: " << (thread_num * block_num) / (gputime * 0.001) << std::endl; 
    
-   //free memories
+   //free memory
    cudaEventDestroy(start);
    cudaEventDestroy(stop);
    

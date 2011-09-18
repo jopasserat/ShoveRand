@@ -31,8 +31,6 @@ namespace shoverand {
 					:Algo<T>(ps) 
 				{}
 				
-				typedef typename Algo<T>::ParameterizedStatusType ParameterizedStatusType;
-				
 				// declare that class RNG models the Algorithm concept
 				BOOST_CONCEPT_ASSERT((RNGAlgorithm< T, Algo >));
 				
@@ -40,6 +38,10 @@ namespace shoverand {
 			
 		} // end of namespace core
 	} // end of namespace prng
+	
+	// shortcut to RNG
+	using prng::core::RNG;
+
 } // end of namespace shoverand
 
 #endif // RNG_HXX

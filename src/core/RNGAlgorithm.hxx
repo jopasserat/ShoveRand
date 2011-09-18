@@ -25,7 +25,7 @@ class RNGAlgorithm {
 private:
 	Algo<T> al_;
    T value_;
-   SeedStatus< Algo > ss_;
+   SeedStatus< Algo >* ss_;
    ParameterizedStatus< Algo >* ps_;
    
    
@@ -35,6 +35,10 @@ private:
    
    
 public:
+	
+	// TODO add variate_generator must_haves
+	// TODO force RNG implementations to provide SeedStatusType and ParameterizedStatusType typdefs
+	
 	
 	// concept requirements
 	BOOST_CONCEPT_USAGE(RNGAlgorithm) {

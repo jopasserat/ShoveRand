@@ -38,7 +38,7 @@ test-cpu: testRngStream2.o RngStream.o
 	$(CPP) -c $< $(CPP_FLAGS)
 
 %.o: %.cu
-	$(NVCC) -c -I. -I../ -I ../src/prng/mrg32k3a  $< $(NVCC_FLAGS) $(ARCH) $(CUDAINCL) $(CUDASDKINCL)
+	$(NVCC) -c -I. -I../ $< $(NVCC_FLAGS) $(ARCH) $(CUDAINCL) $(CUDASDKINCL)
 
 clean:
 	rm -f *~ *.o

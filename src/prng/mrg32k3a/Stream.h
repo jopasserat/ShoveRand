@@ -32,15 +32,13 @@ namespace shoverand {
 					return Cg_[i];
 				}
 				
-				__host__ __device__ inline double getBg(unsigned i) const {
-					return Bg_[i];
-				}
-				
 		//   private:
 			public:
 				double Cg_[6];
-				double Bg_[6];
-				double Ig_[6];
+				
+				/** Bg and Ig are unused in this implementation */
+				//double Bg_[6];
+				//double Ig_[6];
 				
 				/** Seed used for the next created stream */
 				static double nextSeed__[6];

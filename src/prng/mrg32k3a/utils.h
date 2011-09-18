@@ -27,9 +27,10 @@
 #define        MATRIX_COLUMN  3
 
 
-// the following functions are used on both host and device sides
-// they are marked inlined so that utils.h can be included
-// in several compilation units without any linking problem
+/** The following functions are used on both host and device sides
+    they are marked inlined so that utils.h can be included
+    in several compilation units without any linking problem.
+*/
 
 
 namespace shoverand {

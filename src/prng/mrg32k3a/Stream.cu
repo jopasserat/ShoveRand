@@ -11,8 +11,8 @@
 #include <cutil_inline_runtime.h>
 
 #include "Stream.h"
-#include <ParameterizedStatus.h>
-#include <utils.h>
+#include "ParameterizedStatus.h"
+#include "utils.h" // TODO move to details
 
 namespace shoverand {
 	namespace prng {

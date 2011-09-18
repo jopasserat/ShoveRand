@@ -10,17 +10,14 @@
 #ifndef MRG32k3a_HXX
 #define MRG32k3a_HXX
 
-
+#include <shoverand/core/ParameterizedStatus.hxx>
 #include <shoverand/core/SeedStatus.hxx>
-//#include <shoverand/prng/mrg32k3a/Stream.cu>
-#include <shoverand/prng/mrg32k3a/SubStream.h> // TODO shouldn't be included here
 
-#include <shoverand/prng/mrg32k3a/ParameterizedStatus.h>
-#include <shoverand/prng/mrg32k3a/SeedStatus.h>
-#include <shoverand/core/RNG.hxx>
+#include "ParameterizedStatus.h"
+#include "SeedStatus.h"
+#include "utils.h"
 
 
-	
 namespace shoverand {
 	namespace prng {	
 		namespace MRG32k3a {
@@ -43,18 +40,15 @@ namespace shoverand {
 
 			private:
 
-				SeedStatusType ss_;
 				ParameterizedStatusType* ps_;
-				
-				/** SubStream defining the random sequence allocated to current thread */
-				SubStream*	s_;
+				SeedStatusType* ss_;
 				
 				
 			public:
 				
 				__device__
 				MRG32k3a(ParameterizedStatusType* ps)
-				:ss_(SeedStatusType(23)), ps_(ps) 
+				:ps_(ps)
 				{}
 				
 				
@@ -66,12 +60,38 @@ namespace shoverand {
 				void init() {
 
 					// create the independent random sequence associated to current thread
-					s_ = new SubStream(ps_);
+					ss_ = new SeedStatusType(ps_);
 				}
 				
 				__host__ __device__
 				T next() {
-					return s_->next();
+					//return s_->next();
+					
+					long k;
+					double p1, p2, u;
+					
+					// Component 1
+					p1 = a12 * ss_->Cg_[1] - a13n * ss_->Cg_[0];
+					k = static_cast<long> (p1 / m1);
+					p1 -= k * m1;
+					
+					if (p1 < 0.0)  p1 += m1;
+					
+					ss_->Cg_[0] = ss_->Cg_[1]; ss_->Cg_[1] = ss_->Cg_[2]; ss_->Cg_[2] = p1;
+					
+					// Component 2
+					p2 = a21 * ss_->Cg_[5] - a23n * ss_->Cg_[3];
+					k = static_cast<long> (p2 / m2);
+					p2 -= k * m2;
+					
+					if (p2 < 0.0) p2 += m2;
+					
+					ss_->Cg_[3] = ss_->Cg_[4]; ss_->Cg_[4] = ss_->Cg_[5]; ss_->Cg_[5] = p2;
+					
+					// Combination
+					u = ((p1 > p2) ? (p1 - p2) * norm : (p1 - p2 + m1) * norm);
+					
+					return u;
 				}
 				
 
@@ -84,6 +104,11 @@ namespace shoverand {
 
 		} // end of namespace MRG32k3a
 	} // end of namespace prng
+	
+	// shortcut to MRG32k3a
+	using prng::MRG32k3a::MRG32k3a;
+
+	
 } // end of namespace shoverand
 
 #endif // MRG32k3a_HXX
