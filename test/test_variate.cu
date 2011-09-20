@@ -7,29 +7,35 @@
  *
  */
 
+#include <iostream>
+
+
 #include <shoverand/distribution/variate_generator.hpp>
 #include <shoverand/distribution/uniform_01.hpp>
-#include <thrust/random.h>
 
+#include <shoverand/prng/mrg32k3a/MRG32k3a.hxx>
+#include <shoverand/prng/mrg32k3a/ParameterizedStatus.h>
 
-class myrandomengine : public thrust::random::default_random_engine {
-  public:
-  
-};
+using shoverand::MRG32k3a;
 
 int main(int, char**) {
-   boost::uniform_01<double, double>                          distribution;
-   myrandomengine                             engine;
-   distribution<boost::uniform_01 >(engine);
- 
-   /*  
+   boost::uniform_01<double, double>          		 distribution;
+	MRG32k3a< double >::ParameterizedStatusType	    p;
+	MRG32k3a< double >							 			 engine(p) ;
+	
+	std::cout << distribution(engine) << std::endl << engine() << std::endl;
+
+   //distribution(engine);
+      
    boost::variate_generator
          < 
-         thrust::random::default_random_engine,
-         thrust::random::uniform_real_distribution<float>
+         MRG32k3a< double >,
+         boost::uniform_01<double, double>
          >
          
          myVariateGenerator(engine, distribution);
-   */
+
+	std::cout << "variate = " << myVariateGenerator() << std::endl;
+   
    return 0;
 }

@@ -17,7 +17,6 @@
 #include "SeedStatus.h"
 #include "utils.h"
 
-
 namespace shoverand {
 	namespace prng {	
 		namespace MRG32k3a {
@@ -38,13 +37,28 @@ namespace shoverand {
 				typedef SeedStatusMRG32k3a 			SeedStatusType;
 				typedef ParameterizedStatusMRG32k3a ParameterizedStatusType;
 
+				
+				// TODO add to Concept Checking
+				typedef T result_type;
+				typedef T input_type;
+				
+				
 			private:
 
 				ParameterizedStatusType* ps_;
 				SeedStatusType* ss_;
-				
+									
+				long k;
+				double p1, p2, u;
 				
 			public:
+				
+				/** For test purpose only */
+				__host__
+				MRG32k3a(ParameterizedStatusType& ps)
+					:ps_(&ps)
+				{
+				}
 				
 				__device__
 				MRG32k3a(ParameterizedStatusType* ps)
@@ -55,6 +69,9 @@ namespace shoverand {
 				/** Init is divided in two parts:
 				* 	- first, initialize the different streams for every threadblock
 				* 	- second, allocate a SubStream per thread
+				* 
+				* @deprecated
+				* TODO remove this method
 				*/
 				__host__ __device__
 				void init() {
@@ -65,10 +82,6 @@ namespace shoverand {
 				
 				__host__ __device__
 				T next() {
-					//return s_->next();
-					
-					long k;
-					double p1, p2, u;
 					
 					// Component 1
 					p1 = a12 * ss_->Cg_[1] - a13n * ss_->Cg_[0];
@@ -94,6 +107,19 @@ namespace shoverand {
 					return u;
 				}
 				
+				//TODO The two following methods need to be tuned according to MRG32k3a's characteristics
+				__host__ __device__ inline
+				result_type min() const { return 0.0; }
+
+
+				// TODO specialize according to internal data type
+				__host__ __device__ inline
+				result_type max() const { return 2147483647.0; }
+				
+				
+				
+				__host__ __device__
+				result_type operator() () { return this->next(); }
 
 				// concept checking class 
 				// (friend allows to expose private methods to this class only)

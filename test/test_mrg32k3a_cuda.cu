@@ -2,6 +2,10 @@
 #include <shoverand/prng/mrg32k3a/MRG32k3a.hxx>
 #include <shoverand/core/RNG.hxx>
 
+
+#include <shoverand/distribution/variate_generator.hpp>
+#include <shoverand/distribution/uniform_01.hpp>
+
 #include <cstdlib>
 
 #include <cuda.h>
@@ -11,13 +15,14 @@
 
 #include <iostream> // debug purposes
 
+
 // shortcuts :)
 using shoverand::RNG;
 using shoverand::MRG32k3a;
 typedef RNG< float, MRG32k3a > ::ParameterizedStatusType ParameterizedStatusType;
 
 
-
+/** Kernel testing MRG32k3a implementation */
 __global__ void testMRG32k3a(double* ddata,  ParameterizedStatusType* param) {
 
 	// this call might not work with devices of
@@ -29,6 +34,30 @@ __global__ void testMRG32k3a(double* ddata,  ParameterizedStatusType* param) {
    
 	ddata[blockDim.x * blockIdx.x + threadIdx.x] = rng.next();
    __syncthreads();
+}
+
+
+/** Kernel testing variate_generator facility */
+__global__ void testVariateGenerator(double* ddata,  ParameterizedStatusType* param) {
+
+	// this call might not work with devices of
+	// compute capability < 2.x
+	typedef RNG < float, MRG32k3a >  myrandomengine;
+
+	myrandomengine 	rng(param);
+	rng.init();
+
+	boost::uniform_01<myrandomengine, float>          		 distribution(rng);
+
+	boost::variate_generator
+         <
+         myrandomengine,
+         boost::uniform_01<myrandomengine, float>
+         >
+         myVariateGenerator(rng, distribution);
+   
+	ddata[blockDim.x * blockIdx.x + threadIdx.x] = myVariateGenerator();
+	__syncthreads();
 }
 
 
@@ -73,7 +102,8 @@ int main(int, char **) {
    
 
    // kernel call
-   testMRG32k3a<<< block_num, thread_num >>>(d_data, status_device);
+   //testMRG32k3a<<< block_num, thread_num >>>(d_data, status_device);
+	testVariateGenerator<<< block_num, thread_num >>>(d_data, status_device);
    
    cudaEventRecord(stop, 0);
    cudaEventSynchronize(stop);

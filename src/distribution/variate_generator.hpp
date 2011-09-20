@@ -24,7 +24,7 @@
 // implementation details
 #include <shoverand/distribution/uniform_01.hpp>
 #include <shoverand/distribution/pass_through_engine.hpp>
-#include <limits> // replaced Boost's limits with STL's to be portable
+#include <limits> // replaced Boost's limits header with STL's to be portable
 
 namespace boost {
    
@@ -138,9 +138,11 @@ namespace boost {
       };
       typedef typename random::detail::engine_helper<have_int, want_int>::template impl<decorated_engine, typename Distribution::input_type>::type internal_engine_type;
 
-      
+      /** Internal Random Engine, passed by value: evolution will not be tied to the original 
+		 *  engine used to create this variate_generator. */
       internal_engine_type eng_;
-      distribution_type dist_;
+		
+      distribution_type 	dist_;
    };
    
 } // namespace boost
