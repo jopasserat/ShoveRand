@@ -108,6 +108,7 @@ namespace shoverand {
 				}
 				
 				//TODO The two following methods need to be tuned according to MRG32k3a's characteristics
+				// 	and also to its result type.
 				__host__ __device__ inline
 				result_type min() const { return 0.0; }
 
@@ -116,9 +117,8 @@ namespace shoverand {
 				__host__ __device__ inline
 				result_type max() const { return 2147483647.0; }
 				
-				
-				
-				__host__ __device__
+
+				__host__ __device__ inline
 				result_type operator() () { return this->next(); }
 
 				// concept checking class 

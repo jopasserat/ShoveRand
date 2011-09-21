@@ -105,8 +105,8 @@ namespace boost {
       // fucking cast
       : eng_(decorated_engine(e)), dist_(d) { }
 
-      __host__ __device__      
-      result_type operator()() { return dist_(eng_); }
+		__host__ __device__
+		result_type operator() () { return dist_(eng_); }
 
       template<class T>
       __host__ __device__      
@@ -145,6 +145,7 @@ namespace boost {
       distribution_type 	dist_;
    };
    
+	
 } // namespace boost
 
 #endif // SHOVERAND_VARIATE_GENERATOR_HPP

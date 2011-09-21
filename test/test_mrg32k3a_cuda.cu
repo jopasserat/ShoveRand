@@ -47,12 +47,12 @@ __global__ void testVariateGenerator(double* ddata,  ParameterizedStatusType* pa
 	myrandomengine 	rng(param);
 	rng.init();
 
-	boost::uniform_01<myrandomengine, float>          		 distribution(rng);
+	boost::uniform_01<float, float>          		 distribution;
 
 	boost::variate_generator
          <
          myrandomengine,
-         boost::uniform_01<myrandomengine, float>
+         boost::uniform_01<float, float>
          >
          myVariateGenerator(rng, distribution);
    

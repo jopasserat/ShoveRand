@@ -66,20 +66,16 @@ namespace boost {
       };
 
       
-      /** Base use is through variate_generator. Thus, we chose to implement uniform01's
+      /** Base use is through variate_generator. Thus, we chose to implement uniform_01's
             new interface only.
        */
-      // TODO: should this specialization exist?
-      template<class UniformRandomNumberGenerator>
+		template<class UniformRandomNumberGenerator>
       struct select_uniform_01
       {
          template<class RealType>
          struct apply {
-           // typedef backward_compatible_uniform_01<UniformRandomNumberGenerator, RealType> type;
-           // typedef typename select_uniform_01<RealType>:: template apply<RealType>::type type;
-
-            /** Seems to work. Might be useless without backward compatible API. */
-            typedef UniformRandomNumberGenerator type;
+				// TODO check this specialization: might not work
+				typedef UniformRandomNumberGenerator type;
          };
       };
       
