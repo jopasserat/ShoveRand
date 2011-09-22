@@ -65,16 +65,15 @@ namespace boost {
          
       };
 
-      
+		
       /** Base use is through variate_generator. Thus, we chose to implement uniform_01's
-            new interface only.
+			new interface only. WATCH OUT! Use specializations only!
        */
 		template<class UniformRandomNumberGenerator>
       struct select_uniform_01
       {
          template<class RealType>
          struct apply {
-				// TODO check this specialization: might not work
 				typedef UniformRandomNumberGenerator type;
          };
       };
