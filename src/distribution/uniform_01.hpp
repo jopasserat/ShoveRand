@@ -27,8 +27,8 @@
 #include <shoverand/distribution/ptr_helper.hpp>
 #include <limits> // replaced Boost's limits with STL's to be portable
 
-namespace boost {   
-   
+namespace boost {
+	
    namespace detail {
       
       template<class RealType>
