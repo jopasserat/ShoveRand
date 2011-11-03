@@ -3,6 +3,8 @@
 #include <shoverand/core/RNG.hxx>
 
 
+#include <shoverand/prng/tinymt/utils.hxx>
+
 #include <shoverand/distribution/variate_generator.hpp>
 #include <shoverand/distribution/uniform_01.hpp>
 
