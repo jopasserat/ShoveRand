@@ -42,22 +42,22 @@ __global__ void testVariateGenerator(double* ddata,  ParameterizedStatusType* pa
 
 	// this call might not work with devices of
 	// compute capability < 2.x
-	typedef RNG < float, MRG32k3a >  myrandomengine;
+	typedef RNG < float, MRG32k3a >  				 randomengine;
+	typedef boost::uniform_01< float, float>      distribution;
 
-	myrandomengine 	rng(param);
+	randomengine 	rng(param);
 	rng.init();
 
-	boost::uniform_01<float, float>          		 distribution;
+	distribution myDistribution;
 
 	boost::variate_generator
          <
-         myrandomengine,
-         boost::uniform_01<float, float>
+         randomengine,
+         distribution
          >
-         myVariateGenerator(rng, distribution);
+         myVariateGenerator(rng, myDistribution);
    
 	ddata[blockDim.x * blockIdx.x + threadIdx.x] = myVariateGenerator();
-	__syncthreads();
 }
 
 
