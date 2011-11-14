@@ -101,8 +101,8 @@ int main(int, char **) {
    // kernel call
    //testMRG32k3a<<< block_num, thread_num >>>(d_data, status_device);
 	//testVariateGenerator<<< block_num, thread_num >>>(d_data, status_device);
-	testMRG32k3a<<< block_num, thread_num >>>(d_data);
-	//testVariateGenerator<<< block_num, thread_num >>>(d_data);
+	//testMRG32k3a<<< block_num, thread_num >>>(d_data);
+	testVariateGenerator<<< block_num, thread_num >>>(d_data);
    
    cudaEventRecord(stop, 0);
    cudaEventSynchronize(stop);
