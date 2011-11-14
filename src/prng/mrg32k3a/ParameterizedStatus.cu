@@ -7,44 +7,44 @@
 
 	
 /******** Host equivalents to device constants *********/
-const double ParameterizedStatus<MRG32k3a::MRG32k3a> ::  A1p0_host[3][3] = {
+const double ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> ::  A1p0_host[3][3] = {
 	{       0.0,        1.0,       0.0 },
 	{       0.0,        0.0,       1.0 },
 	{ -810728.0,  1403580.0,       0.0 } 
 };
 
-const double ParameterizedStatus<MRG32k3a::MRG32k3a> ::  A2p0_host[3][3] = {
+const double ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> ::  A2p0_host[3][3] = {
 	{        0.0,        1.0,       0.0 },
 	{        0.0,        0.0,       1.0 },
 	{ -1370589.0,        0.0,  527612.0 }
 };
 
-const double ParameterizedStatus<MRG32k3a::MRG32k3a> ::  A1p76_host[3][3] = {
+const double ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> ::  A1p76_host[3][3] = {
 	{      82758667.0, 1871391091.0, 4127413238.0 },
 	{    3672831523.0,   69195019.0, 1871391091.0 },
 	{    3672091415.0, 3528743235.0,   69195019.0 }
 };
 
-const double ParameterizedStatus<MRG32k3a::MRG32k3a> ::  A2p76_host[3][3] = {
+const double ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> ::  A2p76_host[3][3] = {
 	{    1511326704.0, 3759209742.0, 1610795712.0 },
 	{    4292754251.0, 1511326704.0, 3889917532.0 },
 	{    3859662829.0, 4292754251.0, 3708466080.0 }
 };
 
 
-const double ParameterizedStatus<MRG32k3a::MRG32k3a> :: A1p127_host[3][3] = {
+const double ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: A1p127_host[3][3] = {
 	{    2427906178.0, 3580155704.0,  949770784.0 },
 	{     226153695.0, 1230515664.0, 3580155704.0 },
 	{    1988835001.0,  986791581.0, 1230515664.0 }
 };
 
-const double ParameterizedStatus<MRG32k3a::MRG32k3a> :: A2p127_host[3][3] = {
+const double ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: A2p127_host[3][3] = {
 	{    1464411153.0,  277697599.0, 1610723613.0 },
 	{      32183930.0, 1464411153.0, 1022607788.0 },
 	{    2824425944.0,   32183930.0, 2093834863.0 }
 };
 
-const double ParameterizedStatus<MRG32k3a::MRG32k3a> ::  A1_pows_host [11][3][3] = {
+const double ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> ::  A1_pows_host [11][3][3] = {
 	{  { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } },
 	{  { 82758667.0, 1871391091.0, 4127413238.0 }, { 3672831523.0,   69195019.0, 1871391091.0 }, { 3672091415.0, 3528743235.0, 69195019.0 } },
 	{  { 3.36137e+09, 2.3293e+09, 9.96519e+07 } , { 2.00867e+09, 2.93176e+09, 2.3293e+09 } , { 1.11353e+09, 2.3741e+09, 2.93176e+09 } },
@@ -58,7 +58,7 @@ const double ParameterizedStatus<MRG32k3a::MRG32k3a> ::  A1_pows_host [11][3][3]
 	{  { 1.96542e+09, 3.22182e+09, 2.04071e+09 } , { 1.26818e+09, 1.82502e+09, 3.22182e+09 } , { 2.88049e+09, 1.51013e+08, 1.82502e+09 } }
 };
 
-const double ParameterizedStatus<MRG32k3a::MRG32k3a> ::  A2_pows_host [11][3][3] = {
+const double ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> ::  A2_pows_host [11][3][3] = {
 	{  { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } },
 	{  { 1.51133e+09, 3.75921e+09, 1.6108e+09 } , { 4.29275e+09, 1.51133e+09, 3.88992e+09 } , { 3.85966e+09, 4.29275e+09, 3.70847e+09 }},
 	{  { 9.72103e+08, 9.64808e+08, 8.78036e+08 } , { 4.24855e+09, 9.72103e+08, 1.92663e+09 } , { 1.44863e+09, 4.24855e+09, 3.19611e+09 } },
@@ -74,18 +74,18 @@ const double ParameterizedStatus<MRG32k3a::MRG32k3a> ::  A2_pows_host [11][3][3]
 
 
 __host__
-void ParameterizedStatus<MRG32k3a::MRG32k3a>::setUp (unsigned short blocksNumber) {
+void ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a>::setUp (unsigned short blocksNumber) {
 
 			// create streams on the host and initiate them correctly
 			// THIS MUST BE DONE SEQUENTIALLY since current state relies on previsou ones
-			allStreams_host = new MRG32k3a::Stream [blocksNumber];
+			allStreams_host = new shoverand::prng::MRG32k3a::Stream [blocksNumber];
 	
 			// allocate memory for streams on the device
-			cutilSafeCall( cudaMalloc( (void**)&allStreams_, sizeof(MRG32k3a::Stream) * blocksNumber) );
+			cutilSafeCall( cudaMalloc( (void**)&allStreams_, sizeof(shoverand::prng::MRG32k3a::Stream) * blocksNumber) );
 			// transfer Streams
 			cutilSafeCall( cudaMemcpy( allStreams_,
 												allStreams_host,
-												sizeof(MRG32k3a::Stream) * blocksNumber,
+												sizeof(shoverand::prng::MRG32k3a::Stream) * blocksNumber,
 												cudaMemcpyHostToDevice) );
 
 			// allocate and copy from host to device matrices
@@ -105,7 +105,7 @@ void ParameterizedStatus<MRG32k3a::MRG32k3a>::setUp (unsigned short blocksNumber
 }
 
 __host__
-void ParameterizedStatus<MRG32k3a::MRG32k3a>::release() {
+ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: ~ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a>() {
 
 	cutilSafeCall( cudaFree(A2_pows) );
 	cutilSafeCall( cudaFree(A1_pows) );

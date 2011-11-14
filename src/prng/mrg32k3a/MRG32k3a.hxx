@@ -69,7 +69,6 @@ namespace shoverand {
 				
 			private:
 
-				//ParameterizedStatusType* ps_;
 				SeedStatusType* ss_;
 									
 				long k;
@@ -87,12 +86,13 @@ namespace shoverand {
 				/** Initialize the device so that a ParameterizedStatus status is created and copied
 				 *  in device memory for every block used in the application.
 				*   MUST BE CALLED before any call to ShoveRand's features in device code.
+				*   @param block_num Number of CUDA blocks used in the application.
 				*/
 				__host__
-				static void init(unsigned int parameterizedStatusCount) {
+				static void init(unsigned int block_num) {
 					// ParameterizedStatus initialization on both sides
 					ParameterizedStatusType* 	 status_host = new ParameterizedStatusType();
-					status_host->setUp(parameterizedStatusCount);
+					status_host->setUp(block_num);
 
 					ParameterizedStatusType*    status_device;
 					cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(ParameterizedStatusType)) );  

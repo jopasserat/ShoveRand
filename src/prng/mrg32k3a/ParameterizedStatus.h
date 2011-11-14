@@ -20,7 +20,6 @@ namespace shoverand {
 } // end of namespace shoverand
 
 
-
 /** ParameterizedStatus specialization for MRG32k3a */
 template <>
 class ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> {
@@ -63,10 +62,12 @@ class ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> {
 	}
 
 	__host__
-	void setUp (unsigned short blocksNumber);
+	~ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a>();
 
 	__host__
-	void release();
+	void setUp (unsigned short blocksNumber);
+
+	
 		
 };
 

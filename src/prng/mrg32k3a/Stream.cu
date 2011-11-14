@@ -41,7 +41,7 @@ namespace shoverand {
 
 
 				for (int i = 0; i < 6; ++i) {
-					Bg_[i] = Cg_[i] = Ig_[i] = nextSeed__[i];
+					Cg_[i] = nextSeed__[i];
 				}
 
 				shoverand::utils::Math::MatVecModM (ParameterizedStatusMRG32k3a::A1p127_host, nextSeed__, nextSeed__, m1);
