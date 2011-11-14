@@ -1,4 +1,4 @@
-#include <shoverand/prng/mrg32k3a/ParameterizedStatus.h>
+//#include <shoverand/prng/mrg32k3a/ParameterizedStatus.h>
 #include <shoverand/prng/mrg32k3a/MRG32k3a.hxx>
 #include <shoverand/core/RNG.hxx>
 
@@ -21,16 +21,17 @@
 // shortcuts :)
 using shoverand::RNG;
 using shoverand::MRG32k3a;
-typedef RNG< float, MRG32k3a > ::ParameterizedStatusType ParameterizedStatusType;
+//typedef RNG< float, MRG32k3a > ::ParameterizedStatusType ParameterizedStatusType;
 
 
 /** Kernel testing MRG32k3a implementation */
-__global__ void testMRG32k3a(double* ddata,  ParameterizedStatusType* param) {
+//__global__ void testMRG32k3a(double* ddata,  ParameterizedStatusType* param) {
+__global__ void testMRG32k3a(double* ddata) {
 
 	// this call might not work with devices of
 	// compute capability < 2.x
-	RNG < float, MRG32k3a > 	rng(param);
-	rng.init();
+	RNG < float, MRG32k3a > 	rng;
+	//rng.init();
 
    // TODO old devices compliant version
    
@@ -40,15 +41,16 @@ __global__ void testMRG32k3a(double* ddata,  ParameterizedStatusType* param) {
 
 
 /** Kernel testing variate_generator facility */
-__global__ void testVariateGenerator(double* ddata,  ParameterizedStatusType* param) {
+//__global__ void testVariateGenerator(double* ddata,  ParameterizedStatusType* param) {
+__global__ void testVariateGenerator(double* ddata) {
 
 	// this call might not work with devices of
 	// compute capability < 2.x
 	typedef RNG < float, MRG32k3a >  				 randomengine;
 	typedef boost::uniform_01< float, float>      distribution;
 
-	randomengine 	rng(param);
-	rng.init();
+	randomengine 	rng;
+	//rng.init();
 
 	distribution myDistribution;
 
@@ -86,26 +88,20 @@ int main(int, char **) {
    cutilSafeCall( cudaMemset(d_data, 0, data_size) );
 
 
-	// ParameterizedStatus initialization on both sides
-	ParameterizedStatusType* 	 status_host = new ParameterizedStatusType(); // TODO maybe change to builder method
-	status_host->setUp(block_num);
-
-   ParameterizedStatusType*    status_device;
-   cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(ParameterizedStatusType)) );  
-   cutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(ParameterizedStatusType), cudaMemcpyHostToDevice) );
-
-
    if (cudaGetLastError() != cudaSuccess) {
       std::cerr << "error has occured before kernel call." << std::endl;
       exit(1);
    }
    
+	RNG< float, MRG32k3a > ::init(block_num);
+
    cudaEventRecord(start, 0);
    
 
    // kernel call
    //testMRG32k3a<<< block_num, thread_num >>>(d_data, status_device);
-	testVariateGenerator<<< block_num, thread_num >>>(d_data, status_device);
+	//testVariateGenerator<<< block_num, thread_num >>>(d_data, status_device);
+	testVariateGenerator<<< block_num, thread_num >>>(d_data);
    
    cudaEventRecord(stop, 0);
    cudaEventSynchronize(stop);
@@ -145,10 +141,7 @@ int main(int, char **) {
    cudaEventDestroy(start);
    cudaEventDestroy(stop);
    
+	RNG< float, MRG32k3a > :: release();
    delete [] h_data;
-   cutilSafeCall(cudaFree(d_data));
-
-	cutilSafeCall(cudaFree(status_device));
-	delete status_host;
-   
+   cutilSafeCall(cudaFree(d_data));   
 }

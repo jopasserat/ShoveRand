@@ -10,6 +10,10 @@
 #ifndef MRG32k3a_HXX
 #define MRG32k3a_HXX
 
+#include <cuda.h>
+#include <cutil.h>
+#include <cutil_inline_runtime.h>
+
 #include <shoverand/core/ParameterizedStatus.hxx>
 #include <shoverand/core/SeedStatus.hxx>
 
@@ -21,6 +25,26 @@ namespace shoverand {
 	namespace prng {	
 		namespace MRG32k3a {
 
+			/** Stores the address of the array containing all the ParameterizedStatuses.
+			 *  DO NOT USE IT directly!
+			 * */
+			__device__
+			ParameterizedStatusMRG32k3a* ps_;
+			
+			
+			/** This kernel is a hack to avoid the user to pass ParameterizedStatus 
+			 * as parameter of his own kernels. 
+			 * @param inStatus Address of the PREVIOUSLY ALLOCATED ParameterizedStatus array to store
+			 * 					 in global variable ps_
+			 */
+			__global__
+			static void fillParameterizedStatus(ParameterizedStatusMRG32k3a* inStatus) {
+				if (threadIdx.x == 0) {
+					ps_ = inStatus;
+				}
+			}
+			
+			
 			/** Class statically checking the RNGAlgorithm policy's interface.
 			Most of this class' methods are marked as __host__ so that BCCL
 			can check their presence. 
@@ -45,39 +69,45 @@ namespace shoverand {
 				
 			private:
 
-				ParameterizedStatusType* ps_;
+				//ParameterizedStatusType* ps_;
 				SeedStatusType* ss_;
 									
 				long k;
 				double p1, p2, u;
-				
+
 			public:
 				
-				/** For test purpose only */
-				__host__
-				MRG32k3a(ParameterizedStatusType& ps)
-					:ps_(&ps)
-				{
+				/** __host__ tag is here for concept checking purpose only */
+				__host__ __device__
+				MRG32k3a() {
+					ss_ = new SeedStatusMRG32k3a(ps_);
 				}
 				
-				__device__
-				MRG32k3a(ParameterizedStatusType* ps)
-				:ps_(ps)
-				{}
 				
-				
-				/** Init is divided in two parts:
-				* 	- first, initialize the different streams for every threadblock
-				* 	- second, allocate a SubStream per thread
-				* 
-				* @deprecated
-				* TODO remove this method
+				/** Initialize the device so that a ParameterizedStatus status is created and copied
+				 *  in device memory for every block used in the application.
+				*   MUST BE CALLED before any call to ShoveRand's features in device code.
 				*/
-				__host__ __device__
-				void init() {
+				__host__
+				static void init(unsigned int parameterizedStatusCount) {
+					// ParameterizedStatus initialization on both sides
+					ParameterizedStatusType* 	 status_host = new ParameterizedStatusType();
+					status_host->setUp(parameterizedStatusCount);
 
-					// create the independent random sequence associated to current thread
-					ss_ = new SeedStatusType(ps_);
+					ParameterizedStatusType*    status_device;
+					cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(ParameterizedStatusType)) );  
+					cutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(ParameterizedStatusType), cudaMemcpyHostToDevice) );
+					
+					delete status_host;
+					
+					// call the hack kernel with only one thread to copy the array's address
+					fillParameterizedStatus<<<1,1>>> (status_device);
+				}
+				
+				/** Release resources allocated by init */
+				__host__
+				static void release() {
+					cutilSafeCall(cudaFree(ps_));
 				}
 				
 				__host__ __device__
@@ -128,6 +158,8 @@ namespace shoverand {
 
 			};
 
+			
+			
 		} // end of namespace MRG32k3a
 	} // end of namespace prng
 	

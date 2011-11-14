@@ -42,10 +42,10 @@ public:
 	
 	// concept requirements
 	BOOST_CONCEPT_USAGE(RNGAlgorithm) {
-      al_.init();                // require Algo<T>::init()
+      al_.init(42);                // require Algo<T>::init()
 		value_ = al_.next();       // require T Algo<T>::next() 
       same_type(ss_, al_.ss_);   // require Algo<T>::ss_ to be of SeedStatus<Algo> type
-      same_type(ps_, al_.ps_);   // require Algo<T>::ps_ to be of ParameterizedStatus<Algo> type
+      //same_type(ps_, al_.ps_);   // require Algo<T>::ps_ to be of ParameterizedStatus<Algo> type
    }
 
 };

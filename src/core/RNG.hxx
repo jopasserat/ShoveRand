@@ -12,6 +12,7 @@
 
 #include <boost/concept_check.hpp>
 #include "RNGAlgorithm.hxx"
+#include "ParameterizedStatus.hxx"
 
 
 namespace shoverand {
@@ -26,10 +27,10 @@ namespace shoverand {
 				
 			public:
 				
-				__device__
-				RNG ( ParameterizedStatus<Algo >* ps)
-					:Algo<T>(ps) 
-				{}
+// 				__device__
+// 				RNG ( ParameterizedStatus<Algo >* ps)
+// 					:Algo<T>(ps) 
+// 				{}
 				
 				// declare that class RNG models the Algorithm concept
 				BOOST_CONCEPT_ASSERT((RNGAlgorithm< T, Algo >));
@@ -37,6 +38,8 @@ namespace shoverand {
 			};
 			
 		} // end of namespace core
+		
+		
 	} // end of namespace prng
 	
 	// shortcut to RNG
@@ -45,3 +48,5 @@ namespace shoverand {
 } // end of namespace shoverand
 
 #endif // RNG_HXX
+
+
