@@ -1,6 +1,6 @@
 #include "ParameterizedStatus.h"
 #include "Stream.h"
-
+ 
 #include <cuda.h>
 #include <cutil.h>
 #include <cutil_inline_runtime.h>

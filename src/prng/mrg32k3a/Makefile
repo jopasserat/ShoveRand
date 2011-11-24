@@ -19,14 +19,10 @@ CUDASDKLIB  = -L/opt/cuda/C/common/lib/linux/
 CUTILLIB    = /opt/cuda/C/lib/libcutil_x86_64.a
 CUDALIB	    = /opt/cuda/lib64
 
-EXEC= test-mrg32k3a
-
-.SUFFIXES:	.cu .cubin .ptx .bin
-
-all: *.o
+all: $(patsubst %.cu,%.o,$(wildcard *.cu))
 
 # Compilation rules
-%.o: %.cu
+%.o: %.cu %.h
 	$(NVCC) -c -I. -I ../../.. $< $(NVCC_FLAGS) $(ARCH) $(CUDAINCL) $(CUDASDKINCL)
 
 clean:
