@@ -27,7 +27,7 @@
 #include <shoverand/distribution/ptr_helper.hpp>
 #include <limits> // replaced Boost's limits with STL's to be portable
 
-namespace boost {
+namespace shoverand {
 	
    namespace detail {
       
@@ -118,7 +118,7 @@ namespace boost {
    : public detail::select_uniform_01<UniformRandomNumberGenerator>::template apply<RealType>::type
    {
       typedef typename detail::select_uniform_01<UniformRandomNumberGenerator>::template apply<RealType>::type impl_type;
-      typedef boost::random::detail::ptr_helper<UniformRandomNumberGenerator> traits;
+      typedef shoverand::distribution::detail::ptr_helper<UniformRandomNumberGenerator> traits;
    public:
 
       __host__ __device__      
@@ -132,6 +132,6 @@ namespace boost {
       
    };
    
-} // namespace boost
+} // namespace shoverand
 
 #endif // SHOVERAND_DISTRIBUTION_UNIFORM_01_HPP

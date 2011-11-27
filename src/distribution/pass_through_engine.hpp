@@ -20,8 +20,8 @@
 #include <shoverand/distribution/ptr_helper.hpp>
 
 
-namespace boost {
-   namespace random {
+namespace shoverand {
+   namespace distribution {
       namespace detail {
          
          template<class UniformRandomNumberGenerator>
@@ -60,7 +60,7 @@ namespace boost {
          };
          
       } // namespace detail
-   } // namespace random
-} // namespace boost
+   } // namespace distribution
+} // namespace shoverand
 
 #endif // SHOVERAND_DISTRIBUTION_PASS_THROUGH_ENGINE_HPP

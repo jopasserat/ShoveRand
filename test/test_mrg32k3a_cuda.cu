@@ -47,14 +47,14 @@ __global__ void testVariateGenerator(double* ddata) {
 	// this call might not work with devices of
 	// compute capability < 2.x
 	typedef RNG < float, MRG32k3a >  				 randomengine;
-	typedef boost::uniform_01< float, float>      distribution;
+	typedef shoverand::uniform_01< float, float>      distribution;
 
 	randomengine 	rng;
 	//rng.init();
 
 	distribution myDistribution;
 
-	boost::variate_generator
+	shoverand::variate_generator
          <
          randomengine,
          distribution

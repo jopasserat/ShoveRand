@@ -19,8 +19,8 @@
 #include <shoverand/distribution/uniform_01.hpp>
 
 
-namespace boost {
-	namespace random {
+namespace shoverand {
+	namespace distribution {
 		namespace detail {
 
 			template<class UniformRandomNumberGenerator, class IntType = unsigned long>
@@ -69,8 +69,8 @@ namespace boost {
 
 
 		} // namespace detail
-	} // namespace random
-} // namespace boost
+	} // namespace distribution
+} // namespace shoverand
 
 #endif // SHOVERAND_RANDOM_UNIFORM_INT_FLOAT_HPP
 

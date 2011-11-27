@@ -18,13 +18,13 @@
  *
  */
 
-#ifndef BOOST_RANDOM_DETAIL_PTR_HELPER_HPP
-#define BOOST_RANDOM_DETAIL_PTR_HELPER_HPP
+#ifndef SHOVERAND_DISTRIBUTION_DETAIL_PTR_HELPER_HPP
+#define SHOVERAND_DISTRIBUTION_DETAIL_PTR_HELPER_HPP
 
 
 
-namespace boost {
-   namespace random {
+namespace shoverand {
+   namespace distribution {
       namespace detail {
          
          // type_traits could help here, but I don't want to depend on boost::type_traits.
@@ -72,8 +72,8 @@ namespace boost {
 
          
       } // namespace detail
-   } // namespace random
-} // namespace boost
+   } // namespace distribution
+} // namespace shoverand
 
 
-#endif // BOOST_RANDOM_DETAIL_PTR_HELPER_HPP
+#endif // SHOVERAND_DISTRIBUTION_DETAIL_PTR_HELPER_HPP

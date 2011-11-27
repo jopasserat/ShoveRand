@@ -27,9 +27,9 @@
 #include <shoverand/distribution/uniform_int_float.hpp>
 #include <limits> // replaced Boost's limits header with STL's to be portable
 
-namespace boost {
+namespace shoverand {
    
-   namespace random {
+   namespace distribution {
       namespace detail {
          
          template<bool have_int, bool want_int>
@@ -55,7 +55,7 @@ namespace boost {
             {
                // default uniform real distribution is U01
                // typedef thrust::random::uniform_real_distribution<Engine, DistInputType> type;
-               typedef boost::uniform_01<Engine, DistInputType> type;
+               typedef shoverand::uniform_01<Engine, DistInputType> type;
             };
          };
          
@@ -67,7 +67,7 @@ namespace boost {
             {
                // default uniform real distribution is U01
                // typedef thrust::random::uniform_real_distribution<Engine, DistInputType> type;
-               typedef boost::uniform_01<Engine, DistInputType> type;
+               typedef shoverand::uniform_01<Engine, DistInputType> type;
             };
          };
          
@@ -83,14 +83,14 @@ namespace boost {
 			};
 
       } // namespace detail
-   } // namespace random
+   } // namespace distribution
 
 
    template<class Engine, class Distribution>
 	   class variate_generator
 	   {
 		   private:
-			   typedef random::detail::pass_through_engine<Engine> decorated_engine;
+			   typedef distribution::detail::pass_through_engine<Engine> decorated_engine;
 
 		   public:
 			   typedef typename decorated_engine::base_type engine_value_type;
@@ -134,7 +134,7 @@ namespace boost {
 				   have_int = std::numeric_limits<typename decorated_engine::result_type>::is_integer,
 				   want_int = std::numeric_limits<typename Distribution::input_type>::is_integer
 			   };
-			   typedef typename random::detail::engine_helper<have_int, want_int>::template impl<decorated_engine, typename Distribution::input_type>::type internal_engine_type;
+			   typedef typename distribution::detail::engine_helper<have_int, want_int>::template impl<decorated_engine, typename Distribution::input_type>::type internal_engine_type;
 
 			   /** Internal Random Engine, passed by value: evolution will not be tied to the original 
 			    *  engine used to create this variate_generator. */
@@ -144,6 +144,6 @@ namespace boost {
 	   };
 
 
-} // namespace boost
+} // namespace shoverand
 
 #endif // SHOVERAND_VARIATE_GENERATOR_HPP
