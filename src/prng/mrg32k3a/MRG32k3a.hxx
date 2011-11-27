@@ -102,6 +102,9 @@ namespace shoverand {
 					
 					// call the hack kernel with only one thread to copy the array's address
 					fillParameterizedStatus<<<1,1>>> (status_device);
+					
+					// wait until preceeding kernel to complete
+					cutilSafeCall( cudaDeviceSynchronize() );
 				}
 				
 				/** Release resources allocated by init */
