@@ -67,6 +67,12 @@ __global__ void testVariateGenerator(double* ddata) {
 
 int main(int, char **) {
 
+	size_t memFree;
+	size_t memTotal;
+
+	cudaMemGetInfo(&memFree, &memTotal);
+	std :: cerr << "Available device memory at the beginning: " << memFree << "/" << memTotal << std::endl;
+
    int block_num = 3;
    int thread_num = 512;
    int data_size = block_num * thread_num * sizeof(double);
@@ -75,6 +81,7 @@ int main(int, char **) {
    double* h_data;
    cudaError_t e;
    float gputime;
+
    
    // create timers 
    cudaEvent_t start;
@@ -93,8 +100,9 @@ int main(int, char **) {
       exit(1);
    }
    
+	
 	RNG< float, MRG32k3a > ::init(block_num);
-
+	
    cudaEventRecord(start, 0);
    
 
@@ -141,8 +149,12 @@ int main(int, char **) {
    //free memory
    cudaEventDestroy(start);
    cudaEventDestroy(stop);
-   
+
 	RNG< float, MRG32k3a > :: release();
+	
    delete [] h_data;
    cutilSafeCall(cudaFree(d_data));   
+
+	cudaMemGetInfo(&memFree, &memTotal);
+	std :: cerr << "Available device memory at the end: " << memFree << "/" << memTotal << std::endl;
 }
