@@ -25,7 +25,7 @@ class RNGAlgorithm {
 private:
 	Algo<T> al_;
    T value_;
-   SeedStatus< Algo >* ss_;
+   SeedStatus< Algo > ss_;
    ParameterizedStatus< Algo >* ps_;
    
    
@@ -46,7 +46,9 @@ public:
       al_.release();					// require Algo<T>::release()
 		value_ = al_.next();       // require T Algo<T>::next() 
       same_type(ss_, al_.ss_);   // require Algo<T>::ss_ to be of SeedStatus<Algo> type
-      //same_type(ps_, al_.ps_);   // require Algo<T>::ps_ to be of ParameterizedStatus<Algo> type
+     
+		// TODO find a way to check ParameterizedStatus
+		// same_type(ps_, al_.ps_);   // require Algo<T>::ps_ to be of ParameterizedStatus<Algo> type
    }
 
 };
