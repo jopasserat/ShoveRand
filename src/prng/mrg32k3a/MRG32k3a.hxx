@@ -13,6 +13,7 @@
 #include <cuda.h>
 #include <cutil.h>
 #include <cutil_inline_runtime.h>
+#include <stdexcept>
 
 #include <shoverand/core/ParameterizedStatus.hxx>
 #include <shoverand/core/SeedStatus.hxx>
@@ -98,9 +99,10 @@ namespace shoverand {
 				 *  in device memory for every block used in the application.
 				*   MUST BE CALLED before any call to ShoveRand's features in device code.
 				*   @param block_num Number of CUDA blocks used in the application.
+				* 	 @throw std::runtime_error
 				*/
 				__host__
-				static void init(unsigned int block_num) {
+				static void init(unsigned int block_num) throw (std::runtime_error) {
 					// ParameterizedStatus initialization on both sides
 					status_host__ = new ParameterizedStatusType();
 					status_host__->setUp(block_num);
@@ -110,6 +112,11 @@ namespace shoverand {
 										
 					// call the hack kernel with only one thread to copy the array's address
 					fillParameterizedStatus<<<1,1>>> (status_device__);
+					
+					cudaError_t err;
+					if ( (err = cudaGetLastError()) != cudaSuccess ) {
+						throw std::runtime_error(cudaGetErrorString(err));
+					}
 					
 					// wait until preceeding kernel to complete
 					cutilSafeCall( cudaDeviceSynchronize() );
