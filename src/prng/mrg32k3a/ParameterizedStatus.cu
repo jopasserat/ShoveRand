@@ -1,3 +1,4 @@
+
 #include "ParameterizedStatus.h"
 #include "Stream.h"
  
@@ -73,12 +74,22 @@ const double ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> ::  A2_pow
 };
 
 
+// shoverand::prng::MRG32k3a::Stream* ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: allStreams__;
+// 	
+// double* ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: A1p76__;
+// double* ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: A2p76__;
+// double* ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: A1p127__;
+// double* ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: A2p127__;
+// 
+// double* ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: A1_pows__;
+// double* ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: A2_pows__;
+
 __host__
-void ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a>::setUp (unsigned short blocksNumber) {
+void ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: setUp (unsigned short blocksNumber) {
 
 			// create streams on the host and initiate them correctly
 			// THIS MUST BE DONE SEQUENTIALLY since current state relies on previsou ones
-			allStreams_host = new shoverand::prng::MRG32k3a::Stream [blocksNumber];
+			Stream* allStreams_host = new shoverand::prng::MRG32k3a::Stream [blocksNumber];
 	
 			// allocate memory for streams on the device
 			cutilSafeCall( cudaMalloc( (void**)&allStreams_, sizeof(shoverand::prng::MRG32k3a::Stream) * blocksNumber) );
@@ -89,31 +100,31 @@ void ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a>::setUp (unsigned s
 												cudaMemcpyHostToDevice) );
 
 			// allocate and copy from host to device matrices
-			cutilSafeCall( cudaMalloc((void**) &A1p76, sizeof(double) * 9) );
-			cutilSafeCall( cudaMemcpy(A1p76, A1p76_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
-			cutilSafeCall( cudaMalloc((void**) &A2p76, sizeof(double) * 9) );
-			cutilSafeCall( cudaMemcpy(A2p76, A2p76_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
-			cutilSafeCall( cudaMalloc((void**) &A1p127, sizeof(double) * 9) );
-			cutilSafeCall( cudaMemcpy(A1p127, A1p127_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
-			cutilSafeCall( cudaMalloc((void**) &A2p127, sizeof(double) * 9) );
-			cutilSafeCall( cudaMemcpy(A2p127, A2p127_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
+			cutilSafeCall( cudaMalloc((void**) &A1p76_, sizeof(double) * 9) );
+			cutilSafeCall( cudaMemcpy(A1p76_, A1p76_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
+			cutilSafeCall( cudaMalloc((void**) &A2p76_, sizeof(double) * 9) );
+			cutilSafeCall( cudaMemcpy(A2p76_, A2p76_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
+			cutilSafeCall( cudaMalloc((void**) &A1p127_, sizeof(double) * 9) );
+			cutilSafeCall( cudaMemcpy(A1p127_, A1p127_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
+			cutilSafeCall( cudaMalloc((void**) &A2p127_, sizeof(double) * 9) );
+			cutilSafeCall( cudaMemcpy(A2p127_, A2p127_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
 			
-			cutilSafeCall( cudaMalloc((void**) &A1_pows, sizeof(double) * 11 * 3 * 3) );
-			cutilSafeCall( cudaMemcpy(A1_pows, A1_pows_host, sizeof(double) * 11 * 3 * 3, cudaMemcpyHostToDevice ) );
-			cutilSafeCall( cudaMalloc((void**) &A2_pows, sizeof(double) * 11 * 3 * 3) );
-			cutilSafeCall( cudaMemcpy(A2_pows, A2_pows_host, sizeof(double) * 11 * 3 * 3, cudaMemcpyHostToDevice ) );
+			cutilSafeCall( cudaMalloc((void**) &A1_pows_, sizeof(double) * 11 * 3 * 3) );
+			cutilSafeCall( cudaMemcpy(A1_pows_, A1_pows_host, sizeof(double) * 11 * 3 * 3, cudaMemcpyHostToDevice ) );
+			cutilSafeCall( cudaMalloc((void**) &A2_pows_, sizeof(double) * 11 * 3 * 3) );
+			cutilSafeCall( cudaMemcpy(A2_pows_, A2_pows_host, sizeof(double) * 11 * 3 * 3, cudaMemcpyHostToDevice ) );
+
+			delete [] allStreams_host;
 }
 
 __host__
-ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: ~ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a>() {
+void ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: shutdown() {
 
-	cutilSafeCall( cudaFree(A2_pows) );
-	cutilSafeCall( cudaFree(A1_pows) );
-	cutilSafeCall( cudaFree(A2p127) );
-	cutilSafeCall( cudaFree(A1p127) );
-	cutilSafeCall( cudaFree(A2p76) );
-	cutilSafeCall( cudaFree(A1p76) );
+	cutilSafeCall( cudaFree(A2_pows_) );
+	cutilSafeCall( cudaFree(A1_pows_) );
+	cutilSafeCall( cudaFree(A2p127_) );
+	cutilSafeCall( cudaFree(A1p127_) );
+	cutilSafeCall( cudaFree(A2p76_) );
+	cutilSafeCall( cudaFree(A1p76_) );
 	cutilSafeCall( cudaFree(allStreams_) );
-	
-	delete [] allStreams_host;
 }

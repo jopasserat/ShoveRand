@@ -36,11 +36,11 @@ namespace shoverand { namespace prng {	 namespace MRG32k3a {
 		
 		
 	public:
-		__host__
+		__host__ __device__
 		SeedStatus<shoverand::prng::MRG32k3a::MRG32k3a> () {}
 		
 		__device__
-		SeedStatus<shoverand::prng::MRG32k3a::MRG32k3a> (ParameterizedStatusMRG32k3a* params) {
+		void setUp (ParameterizedStatusMRG32k3a* params) {
 			
 			shoverand::prng::MRG32k3a::Stream* stream  = params->allStreams_ + (gridDim.x * blockIdx.y + blockIdx.x);
 			
@@ -72,8 +72,8 @@ namespace shoverand { namespace prng {	 namespace MRG32k3a {
 			};
 
 
-			shoverand::utils::Math::MatPowModM(params->A1p76, A1_pN, m1, pow);  // (A1^(2^76))^n mod m
-			shoverand::utils::Math::MatPowModM(params->A2p76, A2_pN, m2, pow);  // (A2^(2^76))^n mod m
+			shoverand::utils::Math::MatPowModM(params->A1p76_, A1_pN, m1, pow);  // (A1^(2^76))^n mod m
+			shoverand::utils::Math::MatPowModM(params->A2p76_, A2_pN, m2, pow);  // (A2^(2^76))^n mod m
 
 			shoverand::utils::Math::MatVecModM(A1_pN, Cg_, Cg_, m1);
 			shoverand::utils::Math::MatVecModM(A2_pN, &(Cg_[3]), &(Cg_[3]), m2);

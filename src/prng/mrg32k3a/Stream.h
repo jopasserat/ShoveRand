@@ -18,6 +18,7 @@ namespace shoverand {
 				It does not appear on the device since threads are 
 				only handling independent sub-streams.
 			*/
+			// TODO: merge with ParameterizedStatus
 			class Stream {
 			public:
 				

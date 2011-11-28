@@ -68,20 +68,31 @@ namespace shoverand {
 				
 				
 			private:
-
-				SeedStatusType* ss_;
+				static ParameterizedStatusType* status_host__;
+				static ParameterizedStatusType* status_device__;
+				SeedStatusType ss_;
 									
 				long k;
 				double p1, p2, u;
 
 			public:
 				
-				/** __host__ tag is here for concept checking purpose only */
-				__host__ __device__
+				/** __host__ constructor is here for concept checking purpose only */
+				__host__
+				MRG32k3a(int foo) {}
+				
+				__device__
 				MRG32k3a() {
-					ss_ = new SeedStatusMRG32k3a(ps_);
+					//ss_ = new SeedStatusMRG32k3a(ps_);
+					ss_.setUp(ps_);
 				}
 				
+				// NOTE it seems that this sonofabitch CUDA won't generate any code for
+				//		  destructor. screw it!
+// 				__device__
+// 				~MRG32k3a() {
+// 					delete ss_;
+// 				}
 				
 				/** Initialize the device so that a ParameterizedStatus status is created and copied
 				 *  in device memory for every block used in the application.
@@ -91,17 +102,14 @@ namespace shoverand {
 				__host__
 				static void init(unsigned int block_num) {
 					// ParameterizedStatus initialization on both sides
-					ParameterizedStatusType* 	 status_host = new ParameterizedStatusType();
-					status_host->setUp(block_num);
+					status_host__ = new ParameterizedStatusType();
+					status_host__->setUp(block_num);
 
-					ParameterizedStatusType*    status_device;
-					cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(ParameterizedStatusType)) );  
-					cutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(ParameterizedStatusType), cudaMemcpyHostToDevice) );
-					
-					delete status_host;
-					
+					cutilSafeCall( cudaMalloc((void**) &status_device__, sizeof(ParameterizedStatusType)) );  
+					cutilSafeCall( cudaMemcpy(status_device__, status_host__, sizeof(ParameterizedStatusType), cudaMemcpyHostToDevice) );
+										
 					// call the hack kernel with only one thread to copy the array's address
-					fillParameterizedStatus<<<1,1>>> (status_device);
+					fillParameterizedStatus<<<1,1>>> (status_device__);
 					
 					// wait until preceeding kernel to complete
 					cutilSafeCall( cudaDeviceSynchronize() );
@@ -110,29 +118,33 @@ namespace shoverand {
 				/** Release resources allocated by init */
 				__host__
 				static void release() {
-					cutilSafeCall(cudaFree(ps_));
+					status_host__->shutdown();
+					delete status_host__;
+					
+					cutilSafeCall(cudaFree(status_device__));
+					
 				}
 				
 				__host__ __device__
 				T next() {
 					
 					// Component 1
-					p1 = a12 * ss_->Cg_[1] - a13n * ss_->Cg_[0];
+					p1 = a12 * ss_.Cg_[1] - a13n * ss_.Cg_[0];
 					k = static_cast<long> (p1 / m1);
 					p1 -= k * m1;
 					
 					if (p1 < 0.0)  p1 += m1;
 					
-					ss_->Cg_[0] = ss_->Cg_[1]; ss_->Cg_[1] = ss_->Cg_[2]; ss_->Cg_[2] = p1;
+					ss_.Cg_[0] = ss_.Cg_[1]; ss_.Cg_[1] = ss_.Cg_[2]; ss_.Cg_[2] = p1;
 					
 					// Component 2
-					p2 = a21 * ss_->Cg_[5] - a23n * ss_->Cg_[3];
+					p2 = a21 * ss_.Cg_[5] - a23n * ss_.Cg_[3];
 					k = static_cast<long> (p2 / m2);
 					p2 -= k * m2;
 					
 					if (p2 < 0.0) p2 += m2;
 					
-					ss_->Cg_[3] = ss_->Cg_[4]; ss_->Cg_[4] = ss_->Cg_[5]; ss_->Cg_[5] = p2;
+					ss_.Cg_[3] = ss_.Cg_[4]; ss_.Cg_[4] = ss_.Cg_[5]; ss_.Cg_[5] = p2;
 					
 					// Combination
 					u = ((p1 > p2) ? (p1 - p2) * norm : (p1 - p2 + m1) * norm);
@@ -161,7 +173,11 @@ namespace shoverand {
 
 			};
 
+			template <class T>
+			ParameterizedStatusMRG32k3a* MRG32k3a<T>::status_host__;
 			
+			template <class T>
+			ParameterizedStatusMRG32k3a* MRG32k3a<T>::status_device__;
 			
 		} // end of namespace MRG32k3a
 	} // end of namespace prng

@@ -28,17 +28,18 @@ class ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> {
 		
 		typedef shoverand::prng::MRG32k3a::Stream Stream;
 		
-  public:
-	Stream* allStreams_;
-	Stream* allStreams_host;
+  public: // TODO try to get rid of this public qualifier
+	// following members will be stored in device memory
+	  
+   Stream* allStreams_;
 	
-	double* A1p76;
-	double* A2p76;
-	double* A1p127;
-	double* A2p127;
+   double* A1p76_;
+   double* A2p76_;
+   double* A1p127_;
+   double* A2p127_;
 
-	double* A1_pows;
-	double* A2_pows;
+   double* A1_pows_;
+   double* A2_pows_;
 	
 	// following array are static to allow to initialization of const values
 	static const double A1p0_host[3][3];
@@ -47,7 +48,7 @@ class ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> {
 	static const double A2p76_host[3][3];
 	static const double A1p127_host[3][3];
 	static const double A2p127_host[3][3];
-	
+
 	static const double A1_pows_host[11][3][3];
 	static const double A2_pows_host[11][3][3];
 
@@ -61,12 +62,23 @@ class ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> {
 		
 	}
 
-	__host__
-	~ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a>();
-
-	__host__
+	/** Allocate memory for ParameterizedStatus elements
+	 *  on device.
+	 * This method must be called before every kernel launch.
+	 * Memory then needs to be manually released by a call to shutdown.
+	 * @param blocksNumber Number of blocks in the kernel that is to
+	 * 						  be launched.
+	 * @see shutdown
+	 * */
+	__host__ 
 	void setUp (unsigned short blocksNumber);
 
+	/** Release device memory allocated by setUp.
+	 * This method MUST BE CALLED AFTER setUp.
+	 * @see setUp
+	 * */
+	__host__ 
+	void shutdown();
 	
 		
 };
