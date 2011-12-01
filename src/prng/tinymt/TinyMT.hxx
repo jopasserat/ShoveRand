@@ -21,6 +21,22 @@ namespace shoverand {
 	namespace prng {	
 		namespace TinyMT {
 
+			__device__ 
+			ParameterizedStatusTinyMT* paramArray;
+			
+			/** This kernel is a hack to avoid the user to pass ParameterizedStatus 
+			 * as parameter of his own kernels. 
+			 * @param inStatus Address of the PREVIOUSLY ALLOCATED ParameterizedStatus array to store
+			 * 					 in global variable ps_
+			 */
+			__global__
+			static void fillParameterizedStatus(ParameterizedStatusTinyMT* inStatus) {
+				if (threadIdx.x == 0) {
+					paramArray = inStatus;
+				}
+			}
+			
+			
 			/** Class statically checking the RNGAlgorithm policy's interface.
 			Most of this class' methods are marked as __host__ so that BCCL
 			can check their presence. 
@@ -45,66 +61,64 @@ namespace shoverand {
 				
 			private:
 
-				ParameterizedStatusType* ps_;
-				SeedStatusType* ss_;
-									
-				long k;
-				double p1, p2, u;
+				__shared__ 
+				ParameterizedStatusType ps_;
+				
+				SeedStatusType ss_;
+				
 				
 			public:
 				
-				/** For test purpose only */
-				__host__
-				TinyMT(ParameterizedStatusType& ps)
-					:ps_(&ps)
+				/**TinyMT's default constructor.
+				 * Initialize ParameterizedStatus according to global blockId.
+				 * ParameterizedStatuses array must have been transfered to device
+				 * memory before.
+				 * @see init
+					@note  __host__ tag is here for concept check purpose only 
+				 */
+				__host__ __device__
+				TinyMT() 
+					:ps_(paramArray + (blockIdx.x * blockDim.y + blockIdx.y) )
 				{
+					ss_.setUp(ps_);
 				}
 				
-				__device__
-				TinyMT(ParameterizedStatusType* ps)
-				:ps_(ps)
-				{}
 				
-				
-				/** Init is divided in two parts:
-				* 	- first, initialize the different streams for every threadblock
-				* 	- second, allocate a SubStream per thread
-				* 
-				* @deprecated
-				* TODO remove this method
+				/** Initialize the device so that a ParameterizedStatus status is created and copied
+				 *  in device memory for every block used in the application.
+				*   MUST BE CALLED before any call to ShoveRand's features in device code.
+				*   @param block_num Number of CUDA blocks used in the application.
 				*/
-				__host__ __device__
-				void init() {
+				__host__ 
+				static void init(unsigned int block_num) {
+					
+					// ParameterizedStatus initialization on both sides
+					ParameterizedStatusType* 	 status_host = new ParameterizedStatusType[block_num];
+					status_host->setUp(block_num);
 
-					// create the independent random sequence associated to current thread
-					ss_ = new SeedStatusType(ps_);
+					ParameterizedStatusType*    status_device;
+					cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(ParameterizedStatusType) * block_num) );  
+					cutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(ParameterizedStatusType) * block_num, cudaMemcpyHostToDevice) );
+					
+					delete [] status_host;
+					
+					// call the hack kernel with only one thread to copy the array's address
+					fillParameterizedStatus<<<1,1>>> (status_device);
+					
+					// wait until preceeding kernel to complete
+					cutilSafeCall( cudaDeviceSynchronize() );
+				}
+				
+				/** Release resources allocated by init */
+				__host__
+				static void release() {
+					// TODO 
 				}
 				
 				__host__ __device__
 				T next() {
 					
-					// Component 1
-					p1 = a12 * ss_->Cg_[1] - a13n * ss_->Cg_[0];
-					k = static_cast<long> (p1 / m1);
-					p1 -= k * m1;
-					
-					if (p1 < 0.0)  p1 += m1;
-					
-					ss_->Cg_[0] = ss_->Cg_[1]; ss_->Cg_[1] = ss_->Cg_[2]; ss_->Cg_[2] = p1;
-					
-					// Component 2
-					p2 = a21 * ss_->Cg_[5] - a23n * ss_->Cg_[3];
-					k = static_cast<long> (p2 / m2);
-					p2 -= k * m2;
-					
-					if (p2 < 0.0) p2 += m2;
-					
-					ss_->Cg_[3] = ss_->Cg_[4]; ss_->Cg_[4] = ss_->Cg_[5]; ss_->Cg_[5] = p2;
-					
-					// Combination
-					u = ((p1 > p2) ? (p1 - p2) * norm : (p1 - p2 + m1) * norm);
-					
-					return u;
+					// TODO
 				}
 				
 				//TODO The two following methods need to be tuned according to TinyMT's characteristics
