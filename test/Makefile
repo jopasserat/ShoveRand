@@ -25,7 +25,7 @@ EXEC= test-shoverand
 
 OBJS_MRG32k3a = $(patsubst %.cu,%.o,$(wildcard ../src/prng/mrg32k3a/*.cu))
 OBJS_MRG32k3a_basenamed = $(patsubst ../src/prng/mrg32k3a/%.cu,%.o, $(OBJS_MRG32k3a))
-OBJS_TEST = test_mrg32k3a_cuda.o 
+OBJS_TEST = test-shoverand.o 
 
 OBJS= $(OBJS_MRG32k3a_basenamed) $(OBJS_TEST)
 
