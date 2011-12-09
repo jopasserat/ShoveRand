@@ -37,7 +37,7 @@ test-shoverand:	mrg32k3a $(OBJS)
 test-cpu: testRngStream2.o RngStream.o 
 	$(CPP) $^ -o $@
 
-mrg32k3a:
+mrg32k3a: $(wildcard ../src/prng/mrg32k3a/*.cu)
 	$(MAKE) -C ../src/prng/mrg32k3a
 
 # Compilation rules
