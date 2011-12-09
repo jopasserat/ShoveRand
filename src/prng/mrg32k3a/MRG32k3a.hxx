@@ -14,6 +14,9 @@
 #include <cutil.h>
 #include <cutil_inline_runtime.h>
 #include <stdexcept>
+#include <vector>
+#include <numeric>
+
 
 #include <shoverand/core/ParameterizedStatus.hxx>
 #include <shoverand/core/SeedStatus.hxx>
@@ -33,6 +36,12 @@ namespace shoverand {
 			ParameterizedStatusMRG32k3a* ps_;
 			
 			
+			__constant__ __device__
+			int kernelCount;
+			
+			__device__
+			ParameterizedStatusMRG32k3a** array;
+			
 			/** This kernel is a hack to avoid the user to pass ParameterizedStatus 
 			 * as parameter of his own kernels. 
 			 * @param inStatus Address of the PREVIOUSLY ALLOCATED ParameterizedStatus array to store
@@ -45,6 +54,17 @@ namespace shoverand {
 				}
 			}
 			
+			/** This kernel is a hack to avoid the user to pass their kernel's 
+			 * assigned ParameterizedStatus as a parameter of the said kernel. 
+			 * @param inArray   Address of the PREVIOUSLY ALLOCATED ParameterizedStatus array to store
+			 * 					 in global variable array
+			 */
+			__global__
+			static void fillParameterizedStatusArray(ParameterizedStatusMRG32k3a** inArray) {
+				if (threadIdx.x == 0) {
+					array = inArray;
+				}
+			}
 			
 			/** Class statically checking the RNGAlgorithm policy's interface.
 			Most of this class' methods are marked as __host__ so that BCCL
@@ -72,6 +92,8 @@ namespace shoverand {
 				static ParameterizedStatusType* status_host__;
 				static ParameterizedStatusType* status_device__;
 				SeedStatusType ss_;
+				
+				static ParameterizedStatusType** array_device__;
 									
 				long k;
 				double p1, p2, u;
@@ -84,11 +106,10 @@ namespace shoverand {
 				
 				__device__
 				MRG32k3a() {
-					//ss_ = new SeedStatusMRG32k3a(ps_);
 					ss_.setUp(ps_);
 				}
 				
-				// NOTE it seems that this sonofabitch CUDA won't generate any code for
+				// NOTE it seems that this *** CUDA won't generate any code for
 				//		  destructor. screw it!
 // 				__device__
 // 				~MRG32k3a() {
@@ -122,14 +143,52 @@ namespace shoverand {
 					cutilSafeCall( cudaDeviceSynchronize() );
 				}
 				
+				
+				/** TODO doc me! and release method */
+				__host__
+				static void init(const std::vector< int >& inKernelRandomConfiguration) throw (std::runtime_error) {
+					
+					int kernelCount = inKernelRandomConfiguration.size();
+					cutilSafeCall ( cudaMemcpyToSymbol ( shoverand::prng::MRG32k3a::kernelCount, &kernelCount, sizeof(int) ) );
+					
+					int block_num = std::accumulate ( inKernelRandomConfiguration.begin(), inKernelRandomConfiguration.end(), 0 );
+					init(block_num); // call classic init
+					
+					cutilSafeCall ( cudaMalloc ( (void**) &array_device__, sizeof (ParameterizedStatusType*) * kernelCount) );
+
+					// init PS pointers array with offset according to input vector
+					for (int i = 0, acc = 0; i < kernelCount; ++i, acc += inKernelRandomConfiguration[i]) {
+						// FIXME
+						cutilSafeCall ( cudaMemcpy ( array_device__ + i, status_device__ + acc, sizeof(ParameterizedStatusType*), cudaMemcpyDeviceToDevice ) );
+					}
+					
+					fillParameterizedStatusArray <<<1, 1>>> (array_device__);
+					
+					cudaError_t err;
+					if ( (err = cudaGetLastError()) != cudaSuccess ) {
+						throw std::runtime_error(cudaGetErrorString(err));
+					}
+					
+					// wait until preceeding kernel to complete
+					cutilSafeCall( cudaDeviceSynchronize() );
+				}
+				
+				
 				/** Release resources allocated by init */
 				__host__
 				static void release() {
-					status_host__->shutdown();
-					delete status_host__;
+					if (status_host__ != NULL) {
+						status_host__->shutdown();
+						delete status_host__;
+					}
 					
-					cutilSafeCall(cudaFree(status_device__));
+					if (status_device__ != NULL) {
+						cutilSafeCall(cudaFree(status_device__));
+					}
 					
+					if (array_device__ != NULL) {
+						cutilSafeCall(cudaFree(array_device__));
+					}
 				}
 				
 				__host__ __device__
@@ -181,11 +240,13 @@ namespace shoverand {
 			};
 
 			template <class T>
-			ParameterizedStatusMRG32k3a* MRG32k3a<T>::status_host__;
+			ParameterizedStatusMRG32k3a* MRG32k3a<T>::status_host__ = NULL;
 			
 			template <class T>
-			ParameterizedStatusMRG32k3a* MRG32k3a<T>::status_device__;
-			
+			ParameterizedStatusMRG32k3a* MRG32k3a<T>::status_device__ = NULL;
+
+			template <class T>
+			ParameterizedStatusMRG32k3a** MRG32k3a<T>::array_device__ = NULL;
 		} // end of namespace MRG32k3a
 	} // end of namespace prng
 	
