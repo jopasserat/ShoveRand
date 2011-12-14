@@ -40,6 +40,9 @@ namespace shoverand {
 			int kernelCount;
 			
 			__device__
+			int kernelIdOffset;
+			
+			__device__
 			ParameterizedStatusMRG32k3a** array;
 			
 			/** This kernel is a hack to avoid the user to pass ParameterizedStatus 
@@ -93,6 +96,7 @@ namespace shoverand {
 				static ParameterizedStatusType* status_device__;
 				SeedStatusType ss_;
 				
+				static ParameterizedStatusType** array_host__;
 				static ParameterizedStatusType** array_device__;
 									
 				long k;
@@ -106,7 +110,14 @@ namespace shoverand {
 				
 				__device__
 				MRG32k3a() {
-					ss_.setUp(ps_);
+					uint id;
+					asm("mov.u32 %0, %gridid;" : "=r"(id) );
+					
+					int kernelID = (id % shoverand::prng::MRG32k3a::kernelCount);
+					
+// 					ss_.setUp(ps_);
+
+					ss_.setUp(array[kernelID]);
 				}
 				
 				// NOTE it seems that this *** CUDA won't generate any code for
@@ -144,7 +155,7 @@ namespace shoverand {
 				}
 				
 				
-				/** TODO doc me! and release method */
+				/** TODO doc me! */
 				__host__
 				static void init(const std::vector< int >& inKernelRandomConfiguration) throw (std::runtime_error) {
 					
@@ -156,12 +167,13 @@ namespace shoverand {
 					
 					cutilSafeCall ( cudaMalloc ( (void**) &array_device__, sizeof (ParameterizedStatusType*) * kernelCount) );
 
+               array_host__ = new ParameterizedStatusType* [ kernelCount ];
 					// init PS pointers array with offset according to input vector
-					for (int i = 0, acc = 0; i < kernelCount; ++i, acc += inKernelRandomConfiguration[i]) {
-						// FIXME
-						cutilSafeCall ( cudaMemcpy ( array_device__ + i, status_device__ + acc, sizeof(ParameterizedStatusType*), cudaMemcpyDeviceToDevice ) );
+					for (int i = 0, acc = 0; i < kernelCount; acc += inKernelRandomConfiguration[i], ++i) {
+				          array_host__[i] = status_device__ + acc;
 					}
 					
+               cutilSafeCall ( cudaMemcpy ( array_device__, array_host__, sizeof(ParameterizedStatusType*) * kernelCount, cudaMemcpyHostToDevice ) );
 					fillParameterizedStatusArray <<<1, 1>>> (array_device__);
 					
 					cudaError_t err;
@@ -188,6 +200,10 @@ namespace shoverand {
 					
 					if (array_device__ != NULL) {
 						cutilSafeCall(cudaFree(array_device__));
+					}
+					
+					if (array_host__ != NULL) {
+						delete [] array_host__;
 					}
 				}
 				
@@ -247,6 +263,9 @@ namespace shoverand {
 
 			template <class T>
 			ParameterizedStatusMRG32k3a** MRG32k3a<T>::array_device__ = NULL;
+
+			template <class T>
+			ParameterizedStatusMRG32k3a** MRG32k3a<T>::array_host__ = NULL;
 		} // end of namespace MRG32k3a
 	} // end of namespace prng
 	
