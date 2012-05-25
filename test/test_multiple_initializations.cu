@@ -13,6 +13,7 @@
 #include <cutil.h>
 #include <cutil_inline_runtime.h>
 
+#include <algorithm> // std::accumulate
 
 #include <iostream> // debug purposes
 
@@ -23,7 +24,7 @@ using shoverand::MRG32k3a;
 __global__ void testMultiple1(float* ddata) {
 
 	RNG < float, MRG32k3a > 	rng;
-   
+
 	ddata[blockDim.x * blockIdx.x + threadIdx.x] = rng.next();
 }
 
@@ -49,98 +50,77 @@ void testMultipleInitializations() {
 	cudaMemGetInfo(&memFree, &memTotal);
 	std :: cerr << "Available device memory at the beginning: " << memFree << "/" << memTotal << std::endl;
 
-   int block_num = 3;
-   int thread_num = 512;
-   int data_size = block_num * thread_num * sizeof(double);
-   
-   double* d_data;
-   double* h_data;
-   cudaError_t e;
-   float gputime;
+	std::vector<int> blocksInKernels;
+	blocksInKernels.push_back(20);
+	blocksInKernels.push_back(60);
+	blocksInKernels.push_back(10);
 
-   
-   // create timers 
-   cudaEvent_t start;
-   cudaEvent_t stop;
-   cudaEventCreate(&start);
-   cudaEventCreate(&stop);
-   
-   
-   // allocate memory for data on device
-   cutilSafeCall( cudaMalloc((void**) &d_data, data_size) );
-   cutilSafeCall( cudaMemset(d_data, 0, data_size) );
+	std::vector<int> threadsPerBlocksInKernels;
+	threadsPerBlocksInKernels.push_back(64);
+	threadsPerBlocksInKernels.push_back(128);
+	threadsPerBlocksInKernels.push_back(256);
+
+	int block_num = std::accumulate ( blocksInKernels.begin(), blocksInKernels.end(), 0 );
+	int thread_num = std::accumulate ( threadsPerBlocksInKernels.begin(), threadsPerBlocksInKernels.end(), 0 );
+	int data_size = block_num * thread_num * sizeof(float);
 
 
-   if (cudaGetLastError() != cudaSuccess) {
-      std::cerr << "error has occured before kernel call." << std::endl;
-      exit(1);
-   }
-   
-	
-   cudaEventRecord(start, 0);
-   
 
-   float* d_bigdata;
-	cutilSafeCall( cudaMalloc( (void**) &d_bigdata, sizeof(float) * 1024*1024) );
-	
-	std::vector<int> paramVector;
-	paramVector.push_back(20);
-	paramVector.push_back(60);
-	paramVector.push_back(10);
+	if (cudaGetLastError() != cudaSuccess) {
+		std::cerr << "error has occurred before kernel call." << std::endl;
+		exit(1);
+	}
 
-	RNG< float, MRG32k3a > ::init ( paramVector );
+
+
+	// allocate memory to get results back on the host
+	float* h_data = new float[1024*1024];
+	if (h_data == NULL) {
+		std::cerr << "failure in allocating host memory for output data." << std::endl;
+		exit(3);
+	}
+	bzero(h_data, 1024*1024*sizeof(float));
+
+	float* d_bigdata;
+	cutilSafeCall( cudaMalloc( (void**) &d_bigdata, sizeof(float) * 1024 * 1024) );
+	cutilSafeCall( cudaMemset( d_bigdata, 0, sizeof(float) * 1024 * 1024));
+
+
+
+	RNG< float, MRG32k3a > ::init ( blocksInKernels );
 	//for (int i = 0; i < 10; ++i) {
-	
-		testMultiple1<<< 20, 64 >>>  ( d_bigdata );
-		cudaDeviceSynchronize();
-// 		testMultiple2<<< 60, 128 >>> ( d_bigdata );
-// 		cudaDeviceSynchronize();
-// 		testMultiple3<<< 10, 256 >>> ( d_bigdata );
-// 		cudaDeviceSynchronize();
-//    }
 
+	testMultiple1<<< blocksInKernels[0], threadsPerBlocksInKernels[0] >>>  ( d_bigdata );
+	cudaError_t e = cudaGetLastError();
+	if (e != cudaSuccess) {
+		std::cerr << "failure in kernel call.\n" << cudaGetErrorString(e) << std::endl;
+		exit(2);
+	}
+	cudaDeviceSynchronize();
 
-   cudaEventRecord(stop, 0);
-   cudaEventSynchronize(stop);
-   
-   e = cudaGetLastError();
-   if (e != cudaSuccess) {
-      std::cerr << "failure in kernel call.\n" << cudaGetErrorString(e) << std::endl;
-      exit(2);
-   }
-   
-   // allocate memory to get results back on the host
-   h_data = new double[data_size];
-   
-   if (h_data == NULL) {
-      std::cerr << "failure in allocating host memory for output data." << std::endl;
-      exit(3);
-   }
-   
-   cutilSafeCall(
-                 cudaMemcpy(h_data,
-                            d_bigdata,
-                            data_size,
-                            cudaMemcpyDeviceToHost));
-   cudaEventElapsedTime(&gputime, start, stop);
-   
-   
-   for (int i = 0; i < block_num * thread_num; ++i) {
+	cutilSafeCall(
+			cudaMemcpy(h_data,
+					d_bigdata,
+					1024*1024,
+					cudaMemcpyDeviceToHost));
+
+	for (int i = 0; i < blocksInKernels[0] * threadsPerBlocksInKernels[0]; ++i) {
 		std::cout << "h_data[" << i << "] = " << h_data[i] << std::endl;
-   }
+	}
 
-   std::cout << "generated numbers: " << thread_num * block_num << std::endl;
-   std::cout << "Processing time: " << gputime << " (ms)" << std::endl;
-   std::cout << "Samples per second: " << (thread_num * block_num) / (gputime * 0.001) << std::endl; 
-   
-   //free memory
-   cudaEventDestroy(start);
-   cudaEventDestroy(stop);
+	// 		testMultiple2<<< blocksInKernels[1], threadsPerBlocksInKernels[1] >>> ( d_bigdata );
+	// 		cudaDeviceSynchronize();
+	// 		testMultiple3<<< blocksInKernels[2], threadsPerBlocksInKernels[2] >>> ( d_bigdata );
+	// 		cudaDeviceSynchronize();
+	//    }
 
+
+
+
+	// release memory
 	RNG< float, MRG32k3a > :: release();
-	
-   delete [] h_data;
-   cutilSafeCall(cudaFree(d_data));   
+	delete [] h_data;
+	cutilSafeCall(cudaFree(d_bigdata));
 
 	cudaMemGetInfo(&memFree, &memTotal);
 	std :: cerr << "Available device memory at the end: " << memFree << "/" << memTotal << std::endl;
