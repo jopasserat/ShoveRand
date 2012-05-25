@@ -25,6 +25,8 @@
 #include "SeedStatus.h"
 #include "utils.h"
 
+#include <cstring> // debug
+
 namespace shoverand {
 	namespace prng {	
 		namespace MRG32k3a {
@@ -43,7 +45,7 @@ namespace shoverand {
 			int kernelIdOffset;
 			
 			__device__
-			ParameterizedStatusMRG32k3a** array;
+			ParameterizedStatusMRG32k3a* array;
 			
 			/** This kernel is a hack to avoid the user to pass ParameterizedStatus 
 			 * as parameter of his own kernels. 
@@ -63,7 +65,7 @@ namespace shoverand {
 			 * 					 in global variable array
 			 */
 			__global__
-			static void fillParameterizedStatusArray(ParameterizedStatusMRG32k3a** inArray) {
+			static void fillParameterizedStatusArray(ParameterizedStatusMRG32k3a* inArray) {
 				if (threadIdx.x == 0) {
 					array = inArray;
 				}
@@ -97,7 +99,7 @@ namespace shoverand {
 				SeedStatusType ss_;
 				
 				static ParameterizedStatusType** array_host__;
-				static ParameterizedStatusType** array_device__;
+				static ParameterizedStatusType* array_device__;
 									
 				long k;
 				double p1, p2, u;
@@ -117,7 +119,7 @@ namespace shoverand {
 					
 // 					ss_.setUp(ps_);
 
-					ss_.setUp(array[kernelID]);
+					ss_.setUp(array + kernelID);
 				}
 				
 				// NOTE it seems that this *** CUDA won't generate any code for
@@ -155,33 +157,49 @@ namespace shoverand {
 				}
 				
 				
-				/** TODO doc me! */
+				/** This method initializes several kernels prior to their launch to avoid
+				 *  multiple memory transfers in case of repeated calls to the same kernels
+				 *  withnin a loop for instance.
+				 *  @param inKernelRandomConfiguration Vector containing the block configuration of
+				 *  every kernel to initialize. */
 				__host__
 				static void init(const std::vector< int >& inKernelRandomConfiguration) throw (std::runtime_error) {
 					
 					int kernelCount = inKernelRandomConfiguration.size();
 					cutilSafeCall ( cudaMemcpyToSymbol ( shoverand::prng::MRG32k3a::kernelCount, &kernelCount, sizeof(int) ) );
 					
-					int block_num = std::accumulate ( inKernelRandomConfiguration.begin(), inKernelRandomConfiguration.end(), 0 );
-					init(block_num); // call classic init
+//					int block_num = std::accumulate ( inKernelRandomConfiguration.begin(), inKernelRandomConfiguration.end(), 0 );
+//					init(block_num); // call classic init
 					
-					cutilSafeCall ( cudaMalloc ( (void**) &array_device__, sizeof (ParameterizedStatusType*) * kernelCount) );
+					// memory allocation for both arrays
+					cutilSafeCall ( cudaMalloc ( (void**) &array_device__, sizeof (ParameterizedStatusType) * kernelCount) );
+					array_host__ = new ParameterizedStatusType* [ kernelCount ];
 
-               array_host__ = new ParameterizedStatusType* [ kernelCount ];
 					// init PS pointers array with offset according to input vector
-					for (int i = 0, acc = 0; i < kernelCount; acc += inKernelRandomConfiguration[i], ++i) {
-				          array_host__[i] = status_device__ + acc;
+//					for (int i = 0, acc = 0; i < kernelCount; acc += inKernelRandomConfiguration[i], ++i) {
+//				          array_host__[i] = status_device__ + acc;
+//					}
+					for (int i = 0; i < kernelCount; ++i) {
+						array_host__[i] = new ParameterizedStatusType();
+						array_host__[i]->setUp(inKernelRandomConfiguration[i]);
+//						cutilSafeCall ( cudaMalloc ( (void**) &(array_device__ + i), sizeof (ParameterizedStatusType) ) );
+						cutilSafeCall ( cudaMemcpy ( array_device__ + i, array_host__[i], sizeof(ParameterizedStatusType), cudaMemcpyHostToDevice ) );
 					}
 					
-               cutilSafeCall ( cudaMemcpy ( array_device__, array_host__, sizeof(ParameterizedStatusType*) * kernelCount, cudaMemcpyHostToDevice ) );
+					//cutilSafeCall ( cudaMemcpy ( array_device__, array_host__, sizeof(ParameterizedStatusType*) * kernelCount, cudaMemcpyHostToDevice ) );
 					fillParameterizedStatusArray <<<1, 1>>> (array_device__);
 					
+					for (int i = 0; i < kernelCount; ++i) {
+						bzero (array_host__[i], sizeof (ParameterizedStatusType));
+						cutilSafeCall ( cudaMemcpy ( array_host__[i], array_device__ + i, sizeof(ParameterizedStatusType), cudaMemcpyDeviceToHost ) );
+					}
+
 					cudaError_t err;
 					if ( (err = cudaGetLastError()) != cudaSuccess ) {
 						throw std::runtime_error(cudaGetErrorString(err));
 					}
 					
-					// wait until preceeding kernel to complete
+					// wait for preceding kernel to complete
 					cutilSafeCall( cudaDeviceSynchronize() );
 				}
 				
@@ -262,7 +280,7 @@ namespace shoverand {
 			ParameterizedStatusMRG32k3a* MRG32k3a<T>::status_device__ = NULL;
 
 			template <class T>
-			ParameterizedStatusMRG32k3a** MRG32k3a<T>::array_device__ = NULL;
+			ParameterizedStatusMRG32k3a* MRG32k3a<T>::array_device__ = NULL;
 
 			template <class T>
 			ParameterizedStatusMRG32k3a** MRG32k3a<T>::array_host__ = NULL;
