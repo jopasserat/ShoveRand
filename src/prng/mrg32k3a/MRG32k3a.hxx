@@ -88,7 +88,7 @@ namespace shoverand {
 					ss_.setUp(ps_);
 				}
 				
-				// NOTE it seems that this sonofabitch CUDA won't generate any code for
+				// NOTE it seems that this CUDA sonofabitch won't generate any code for
 				//		  destructor. screw it!
 // 				__device__
 // 				~MRG32k3a() {
