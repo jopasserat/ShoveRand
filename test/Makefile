@@ -11,7 +11,7 @@ CPP_FLAGS = -Wall -ansi -pedantic -O3
 NVCC_FLAGS = -g -G --compiler-options '-Wall -Wextra -posix'
 
 # Includes
-CUDAINCL    = -I/opt/cuda/include
+CUDAINCL    = 
 CUDASDKINCL = -I/opt/cuda/C/common/inc
 
 # Libs
