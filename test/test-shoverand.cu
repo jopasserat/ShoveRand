@@ -1,9 +1,6 @@
-//#include <shoverand/prng/mrg32k3a/ParameterizedStatus.h>
 #include <shoverand/prng/mrg32k3a/MRG32k3a.hxx>
+#include <shoverand/prng/tinymt/TinyMT.hxx>
 #include <shoverand/core/RNG.hxx>
-
-
-#include <shoverand/prng/tinymt/utils.hxx>
 
 #include <shoverand/distribution/variate_generator.hpp>
 #include <shoverand/distribution/uniform_01.hpp>

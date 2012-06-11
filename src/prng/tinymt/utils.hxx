@@ -3,7 +3,7 @@
  *
  * @brief utility program for CUDA implementation of TinyMT.
  *
- * This is utility proogram for CUDA implementation of TinyMT32.
+ * This is utility program for CUDA implementation of TinyMT32.
  *
  * @author Mutsuo Saito (Hiroshima University)
  * @author Makoto Matsumoto (The University of Tokyo)
