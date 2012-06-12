@@ -18,7 +18,7 @@
 // shortcuts :)
 using shoverand::RNG;
 using shoverand::MRG32k3a;
-//typedef RNG< float, MRG32k3a > ::ParameterizedStatusType ParameterizedStatusType;
+using shoverand::TinyMT;
 
 
 /** Kernel testing MRG32k3a implementation */
@@ -32,6 +32,20 @@ __global__ void testMRG32k3a(double* ddata) {
 
    // TODO old devices compliant version
    
+	ddata[blockDim.x * blockIdx.x + threadIdx.x] = rng.next();
+   __syncthreads();
+}
+
+/** Kernel testing TinyMT implementation */
+__global__ void testTinyMT(double* ddata) {
+
+	// this call might not work with devices of
+	// compute capability < 2.x
+	RNG < float, TinyMT > 	rng;
+	//rng.init();
+
+   // TODO old devices compliant version
+
 	ddata[blockDim.x * blockIdx.x + threadIdx.x] = rng.next();
    __syncthreads();
 }
@@ -98,7 +112,8 @@ int main(int, char **) {
    }
    
 	
-	RNG< float, MRG32k3a > ::init(block_num);
+	//RNG< float, MRG32k3a > ::init(block_num);
+   RNG< float, TinyMT > ::init(block_num);
 	
    cudaEventRecord(start, 0);
    
@@ -107,7 +122,8 @@ int main(int, char **) {
    //testMRG32k3a<<< block_num, thread_num >>>(d_data, status_device);
 	//testVariateGenerator<<< block_num, thread_num >>>(d_data, status_device);
 	//testMRG32k3a<<< block_num, thread_num >>>(d_data);
-	testVariateGenerator<<< block_num, thread_num >>>(d_data);
+//	testVariateGenerator<<< block_num, thread_num >>>(d_data);
+	testTinyMT<<< block_num, thread_num >>>(d_data);
    
    cudaEventRecord(stop, 0);
    cudaEventSynchronize(stop);
@@ -147,7 +163,8 @@ int main(int, char **) {
    cudaEventDestroy(start);
    cudaEventDestroy(stop);
 
-	RNG< float, MRG32k3a > :: release();
+//	RNG< float, MRG32k3a > :: release();
+   	RNG< float, TinyMT > :: release();
 	
    delete [] h_data;
    cutilSafeCall(cudaFree(d_data));   

@@ -37,7 +37,7 @@ private:
 		unsigned int status3_;
 
 public:
-	__host__
+	__host__ __device__
 	SeedStatus<shoverand::prng::TinyMT::TinyMT> () {}
 
 	__device__
