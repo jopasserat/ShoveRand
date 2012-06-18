@@ -4,8 +4,10 @@ cmake_minimum_required( VERSION 2.6.2 )
 project ( SHOVERAND )
 
 SET ( EXECUTABLE_OUTPUT_PATH ${SHOVERAND_BINARY_DIR}/bin )
-message ( "exe: " ${EXECUTABLE_OUTPUT_PATH} )
-message ( "bin dir: " ${SHOVERAND_BINARY_DIR} )
+SET ( LIBRARY_OUTPUT_PATH ${SHOVERAND_BINARY_DIR}/lib )
+message ( "root path: " ${SHOVERAND_BINARY_DIR} )
+message ( "bin dir: " ${EXECUTABLE_OUTPUT_PATH} )
+message ( "lib dir: " ${LIBRARY_OUTPUT_PATH} )
 # -------------------------------------- #
 #                  CUDA                  #
 # -------------------------------------- #
@@ -75,7 +77,7 @@ set( SHOVERAND_HEADERS
    src/prng/mrg32k3a/utils.h
 )
 
-set( SHOVERAND_SOURCES_TEST
+set( SHOVERAND_TEST_SOURCES
    test/test-shoverand.cu
 )
 
@@ -88,4 +90,8 @@ CUDA_ADD_LIBRARY( shoverand
                      ${SHOVERAND_HEADERS}
                      SHARED
                    )
+
+CUDA_ADD_EXECUTABLE( test-shoverand
+                     ${SHOVERAND_TEST_SOURCES}
+                  )
 
