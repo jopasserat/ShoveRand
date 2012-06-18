@@ -12,5 +12,5 @@
 .project
 .cproject
 .settings
-build/
+build_*
 test/test-shoverand
