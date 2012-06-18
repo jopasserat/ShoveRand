@@ -14,7 +14,6 @@ message ( "lib dir: " ${LIBRARY_OUTPUT_PATH} )
 
 message ( " ----  CUDA  ---- " )
 
-
 find_package( CUDA QUIET REQUIRED )
 
 set( CUDA_VERBOSE_BUILD ON )
@@ -50,7 +49,7 @@ endif()
 include( boost.cmake )
 
 # -------------------------------------------------- #
-#     Definition des fichiers sources et headers     #
+#     Source and header files                        #
 # -------------------------------------------------- #
 
 set( SHOVERAND_SOURCES
@@ -82,7 +81,7 @@ set( SHOVERAND_TEST_SOURCES
 )
 
 # -------------------------------------- #
-#         Creation des projets           #
+#         Binaries creation              #
 # -------------------------------------- #
 
 CUDA_ADD_LIBRARY( shoverand
