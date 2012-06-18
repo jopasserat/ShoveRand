@@ -20,6 +20,9 @@
 #ifndef UTILS_HXX
 #define UTILS_HXX
 
+// TODO: try to provide FILE from another way than including the whole cstdio
+#include <cstdio>
+
 namespace shoverand {
 	namespace utils {
 		
