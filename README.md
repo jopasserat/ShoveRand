@@ -1,8 +1,8 @@
 # Shoverand #
 
-## *A Pseudo-Random Number Generation library for GPGPU* ##
+## *A Pseudorandom Number Generation library for GPU* ##
 
-ShoveRand provides implementations of both Pseudo-Random Number Generators (PRNGs) for CUDA-enabled GPUs and also a framework allowing developers to easily add their own PRNGs to ShoveRand.
+ShoveRand provides implementations of both Pseudorandom Number Generators (PRNGs) for CUDA-enabled GPUs and also a framework allowing developers to easily add their own PRNGs to ShoveRand.
 
 Its API is quite similar to what can be encountered when using high-level CPU languages like C++ or Java. Shoverand's main goal is to handle the distribution of stochastic streams automatically without any intervention from the user.
 
@@ -10,7 +10,7 @@ Shoverand also targets PRNG developers: indeed, Shoverand only integrates third-
 
 ## Requirements ##
   * git
-  * cmake
+  * CMake
   * CUDA
 
 ## Setting up Shoverand ##
