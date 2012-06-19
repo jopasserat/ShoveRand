@@ -21,7 +21,7 @@ following cmake process.
 
     mkdir build_<build_type>
     cd build_<build_type>
-    cmake -D <path_to_cuda_sdk> -D CMAKE_BUILD_TYPE=<None | Debug | Release | RelWithDebInfo | MinSizeRel>
+    cmake -D CUDA_SDK_ROOT_DIR=<path_to_cuda_sdk> -D CMAKE_BUILD_TYPE=<None | Debug | Release | RelWithDebInfo | MinSizeRel>
     make
 
 ## Usage ##
