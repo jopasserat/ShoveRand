@@ -27,7 +27,7 @@ message ( "CUDA_LIBRARIES: " "${CUDA_LIBRARIES}" )
 include_directories ( ${CUDA_SDK_ROOT_DIR}/inc )
 include_directories( ${CUDA_SDK_ROOT_DIR}/common/inc )
 
-# include shoverand's directory
+# include shoverand's self directory
 include_directories( "." )
 
 # 1.0
