@@ -15,8 +15,6 @@
 
 
 #include "mtgp-cuda-common.h"
-#include <cutil.h>
-
 
 #include "to-move-into-class.h"
 //#include "mtgp32-cuda-cuterandAPI.h"

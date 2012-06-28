@@ -15,7 +15,7 @@
 #define __STDC_CONSTANT_MACROS 1
 #include <stdio.h>
 #include <cuda.h>
-#include <cutil.h>
+#include <shoverand/util/myCutil.h>
 #include <stdint.h>
 #include <inttypes.h>
 #include <errno.h>
@@ -334,10 +334,10 @@ void make_constant_param(const mtgp32_params_fast_t params[],
 	h_sh2_tbl[i] = params[i].sh2;
     }
     // copy from malloc area only
-    CUDA_SAFE_CALL(cudaMemcpyToSymbol(pos_tbl, h_pos_tbl, size1));
-    CUDA_SAFE_CALL(cudaMemcpyToSymbol(sh1_tbl, h_sh1_tbl, size1));
-    CUDA_SAFE_CALL(cudaMemcpyToSymbol(sh2_tbl, h_sh2_tbl, size1));
-    CUDA_SAFE_CALL(cudaMemcpyToSymbol(mask, h_mask, sizeof(uint32_t)));
+    myCutilSafeCall(cudaMemcpyToSymbol(pos_tbl, h_pos_tbl, size1));
+    myCutilSafeCall(cudaMemcpyToSymbol(sh1_tbl, h_sh1_tbl, size1));
+    myCutilSafeCall(cudaMemcpyToSymbol(sh2_tbl, h_sh2_tbl, size1));
+    myCutilSafeCall(cudaMemcpyToSymbol(mask, h_mask, sizeof(uint32_t)));
     free(h_pos_tbl);
     free(h_sh1_tbl);
     free(h_sh2_tbl);
@@ -374,18 +374,18 @@ void make_texture(const mtgp32_params_fast_t params[],
 	    h_texture_tbl[2][i * TBL_SIZE + j] = params[i].flt_tmp_tbl[j];
 	}
     }
-    CUDA_SAFE_CALL(cudaMemcpy(d_texture_tbl[0], h_texture_tbl[0], size,
+    myCutilSafeCall(cudaMemcpy(d_texture_tbl[0], h_texture_tbl[0], size,
 			      cudaMemcpyHostToDevice));
-    CUDA_SAFE_CALL(cudaMemcpy(d_texture_tbl[1], h_texture_tbl[1], size,
+    myCutilSafeCall(cudaMemcpy(d_texture_tbl[1], h_texture_tbl[1], size,
 			      cudaMemcpyHostToDevice));
-    CUDA_SAFE_CALL(cudaMemcpy(d_texture_tbl[2], h_texture_tbl[2], size,
+    myCutilSafeCall(cudaMemcpy(d_texture_tbl[2], h_texture_tbl[2], size,
 			      cudaMemcpyHostToDevice));
     tex_param_ref.filterMode = cudaFilterModePoint;
     tex_temper_ref.filterMode = cudaFilterModePoint;
     tex_single_ref.filterMode = cudaFilterModePoint;
-    CUDA_SAFE_CALL(cudaBindTexture(0, tex_param_ref, d_texture_tbl[0], size));
-    CUDA_SAFE_CALL(cudaBindTexture(0, tex_temper_ref, d_texture_tbl[1], size));
-    CUDA_SAFE_CALL(cudaBindTexture(0, tex_single_ref, d_texture_tbl[2], size));
+    myCutilSafeCall(cudaBindTexture(0, tex_param_ref, d_texture_tbl[0], size));
+    myCutilSafeCall(cudaBindTexture(0, tex_temper_ref, d_texture_tbl[1], size));
+    myCutilSafeCall(cudaBindTexture(0, tex_single_ref, d_texture_tbl[2], size));
     free(h_texture_tbl[0]);
     free(h_texture_tbl[1]);
     free(h_texture_tbl[2]);
@@ -408,7 +408,7 @@ void make_uint32_random(mtgp32_kernel_status_t* d_status,
     float gputime;
 
     printf("generating 32-bit unsigned random numbers.\n");
-    CUDA_SAFE_CALL(cudaMalloc((void**)&d_data, sizeof(uint32_t) * num_data));
+    myCutilSafeCall(cudaMalloc((void**)&d_data, sizeof(uint32_t) * num_data));
     CUT_SAFE_CALL(cutCreateTimer(&timer));
     h_data = (uint32_t *) malloc(sizeof(uint32_t) * num_data);
     if (h_data == NULL) {
@@ -432,7 +432,7 @@ void make_uint32_random(mtgp32_kernel_status_t* d_status,
 	exit(1);
     }
     CUT_SAFE_CALL(cutStopTimer(timer));
-    CUDA_SAFE_CALL(
+    myCutilSafeCall(
 	cudaMemcpy(h_data,
 		   d_data,
 		   sizeof(uint32_t) * num_data,
@@ -445,7 +445,7 @@ void make_uint32_random(mtgp32_kernel_status_t* d_status,
     CUT_SAFE_CALL(cutDeleteTimer(timer));
     //free memories
     free(h_data);
-    CUDA_SAFE_CALL(cudaFree(d_data));
+    myCutilSafeCall(cudaFree(d_data));
 }
 
 /**
@@ -465,7 +465,7 @@ void make_single_random(mtgp32_kernel_status_t* d_status,
     float gputime;
 
     printf("generating single precision floating point random numbers.\n");
-    CUDA_SAFE_CALL(cudaMalloc((void**)&d_data, sizeof(float) * num_data));
+    myCutilSafeCall(cudaMalloc((void**)&d_data, sizeof(float) * num_data));
     CUT_SAFE_CALL(cutCreateTimer(&timer));
     h_data = (float *) malloc(sizeof(float) * num_data);
     if (h_data == NULL) {
@@ -489,7 +489,7 @@ void make_single_random(mtgp32_kernel_status_t* d_status,
 	exit(1);
     }
     CUT_SAFE_CALL(cutStopTimer(timer));
-    CUDA_SAFE_CALL(
+    myCutilSafeCall(
 	cudaMemcpy(h_data,
 		   d_data,
 		   sizeof(float) * num_data,
@@ -502,7 +502,7 @@ void make_single_random(mtgp32_kernel_status_t* d_status,
     CUT_SAFE_CALL(cutDeleteTimer(timer));
     //free memories
     free(h_data);
-    CUDA_SAFE_CALL(cudaFree(d_data));
+    myCutilSafeCall(cudaFree(d_data));
 }
 
 /**
@@ -522,7 +522,7 @@ void make_single01_random(mtgp32_kernel_status_t* d_status,
     float gputime;
 
     printf("generating single precision floating point random numbers.\n");
-    CUDA_SAFE_CALL(cudaMalloc((void**)&d_data, sizeof(float) * num_data));
+    myCutilSafeCall(cudaMalloc((void**)&d_data, sizeof(float) * num_data));
     CUT_SAFE_CALL(cutCreateTimer(&timer));
     h_data = (float *) malloc(sizeof(float) * num_data);
     if (h_data == NULL) {
@@ -546,7 +546,7 @@ void make_single01_random(mtgp32_kernel_status_t* d_status,
 	exit(1);
     }
     CUT_SAFE_CALL(cutStopTimer(timer));
-    CUDA_SAFE_CALL(
+    myCutilSafeCall(
 	cudaMemcpy(h_data,
 		   d_data,
 		   sizeof(float) * num_data,
@@ -559,7 +559,7 @@ void make_single01_random(mtgp32_kernel_status_t* d_status,
     CUT_SAFE_CALL(cutDeleteTimer(timer));
     //free memories
     free(h_data);
-    CUDA_SAFE_CALL(cudaFree(d_data));
+    myCutilSafeCall(cudaFree(d_data));
 }
 
 int main(int argc, char *argv[])
@@ -609,13 +609,13 @@ int main(int argc, char *argv[])
     CUT_DEVICE_INIT(argc, argv);
 
     num_unit = THREAD_NUM * 3 * block_num;
-    CUDA_SAFE_CALL(cudaMalloc((void**)&d_status,
+    myCutilSafeCall(cudaMalloc((void**)&d_status,
 			      sizeof(mtgp32_kernel_status_t) * block_num));
-    CUDA_SAFE_CALL(cudaMalloc((void**)&d_texture[0],
+    myCutilSafeCall(cudaMalloc((void**)&d_texture[0],
 			      sizeof(uint32_t) * block_num * TBL_SIZE));
-    CUDA_SAFE_CALL(cudaMalloc((void**)&d_texture[1],
+    myCutilSafeCall(cudaMalloc((void**)&d_texture[1],
 			      sizeof(uint32_t) * block_num * TBL_SIZE));
-    CUDA_SAFE_CALL(cudaMalloc((void**)&d_texture[2],
+    myCutilSafeCall(cudaMalloc((void**)&d_texture[2],
 			      sizeof(uint32_t) * block_num * TBL_SIZE));
     r = num_data % num_unit;
     if (r != 0) {
@@ -629,10 +629,10 @@ int main(int argc, char *argv[])
     make_single01_random(d_status, num_data, block_num);
 
     //finalize
-    CUDA_SAFE_CALL(cudaFree(d_status));
-    CUDA_SAFE_CALL(cudaFree(d_texture[0]));
-    CUDA_SAFE_CALL(cudaFree(d_texture[1]));
-    CUDA_SAFE_CALL(cudaFree(d_texture[2]));
+    myCutilSafeCall(cudaFree(d_status));
+    myCutilSafeCall(cudaFree(d_texture[0]));
+    myCutilSafeCall(cudaFree(d_texture[1]));
+    myCutilSafeCall(cudaFree(d_texture[2]));
 #ifdef NEED_PROMPT
     CUT_EXIT(argc, argv);
 #endif

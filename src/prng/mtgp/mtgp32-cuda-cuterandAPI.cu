@@ -15,7 +15,7 @@
 #define __STDC_CONSTANT_MACROS 1
 #include <stdio.h>
 #include <cuda.h>
-#include <cutil.h>
+#include <shoverand/util/myCutil.h>
 #include <stdint.h>
 #include <inttypes.h>
 #include <errno.h>
@@ -90,15 +90,15 @@ void make_constant(const mtgp32_params_fast_t params[],
 	}
     }
     // copy from malloc area only
-    CUDA_SAFE_CALL(cudaMemcpyToSymbol(pos_tbl, h_pos_tbl, size1));
-    CUDA_SAFE_CALL(cudaMemcpyToSymbol(sh1_tbl, h_sh1_tbl, size1));
-    CUDA_SAFE_CALL(cudaMemcpyToSymbol(sh2_tbl, h_sh2_tbl, size1));
-    CUDA_SAFE_CALL(cudaMemcpyToSymbol(param_tbl, h_param_tbl, size2));
-    CUDA_SAFE_CALL(cudaMemcpyToSymbol(temper_tbl, h_temper_tbl, size2));
-    CUDA_SAFE_CALL(cudaMemcpyToSymbol(single_temper_tbl,
+    myCutilSafeCall(cudaMemcpyToSymbol(pos_tbl, h_pos_tbl, size1));
+    myCutilSafeCall(cudaMemcpyToSymbol(sh1_tbl, h_sh1_tbl, size1));
+    myCutilSafeCall(cudaMemcpyToSymbol(sh2_tbl, h_sh2_tbl, size1));
+    myCutilSafeCall(cudaMemcpyToSymbol(param_tbl, h_param_tbl, size2));
+    myCutilSafeCall(cudaMemcpyToSymbol(temper_tbl, h_temper_tbl, size2));
+    myCutilSafeCall(cudaMemcpyToSymbol(single_temper_tbl,
 				      h_single_temper_tbl, size2));
 #if 0
-    CUDA_SAFE_CALL(cudaMemcpyToSymbol(&mask,
+    myCutilSafeCall(cudaMemcpyToSymbol(&mask,
 				      &h_mask, sizeof(uint32_t)));
 #endif
     free(h_pos_tbl);
@@ -143,18 +143,18 @@ void make_constant(const mtgp32_params_fast_t params[],
          h_texture_tbl[2][i * TBL_SIZE + j] = params[i].flt_tmp_tbl[j];
       }
    }
-   CUDA_SAFE_CALL(cudaMemcpy(d_texture_tbl[0], h_texture_tbl[0], size,
+   myCutilSafeCall(cudaMemcpy(d_texture_tbl[0], h_texture_tbl[0], size,
                              cudaMemcpyHostToDevice));
-   CUDA_SAFE_CALL(cudaMemcpy(d_texture_tbl[1], h_texture_tbl[1], size,
+   myCutilSafeCall(cudaMemcpy(d_texture_tbl[1], h_texture_tbl[1], size,
                              cudaMemcpyHostToDevice));
-   CUDA_SAFE_CALL(cudaMemcpy(d_texture_tbl[2], h_texture_tbl[2], size,
+   myCutilSafeCall(cudaMemcpy(d_texture_tbl[2], h_texture_tbl[2], size,
                              cudaMemcpyHostToDevice));
    tex_param_ref.filterMode = cudaFilterModePoint;
    tex_temper_ref.filterMode = cudaFilterModePoint;
    tex_single_ref.filterMode = cudaFilterModePoint;
-   CUDA_SAFE_CALL(cudaBindTexture(0, tex_param_ref, d_texture_tbl[0], size));
-   CUDA_SAFE_CALL(cudaBindTexture(0, tex_temper_ref, d_texture_tbl[1], size));
-   CUDA_SAFE_CALL(cudaBindTexture(0, tex_single_ref, d_texture_tbl[2], size));
+   myCutilSafeCall(cudaBindTexture(0, tex_param_ref, d_texture_tbl[0], size));
+   myCutilSafeCall(cudaBindTexture(0, tex_temper_ref, d_texture_tbl[1], size));
+   myCutilSafeCall(cudaBindTexture(0, tex_single_ref, d_texture_tbl[2], size));
    free(h_texture_tbl[0]);
    free(h_texture_tbl[1]);
    free(h_texture_tbl[2]);

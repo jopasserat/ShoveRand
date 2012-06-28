@@ -11,10 +11,9 @@
 #define MRG32k3a_HXX
 
 #include <cuda.h>
-#include <cutil.h>
-#include <cutil_inline_runtime.h>
 #include <stdexcept>
 
+#include <shoverand/util/myCutil.h>
 #include <shoverand/core/ParameterizedStatus.hxx>
 #include <shoverand/core/SeedStatus.hxx>
 
@@ -107,8 +106,8 @@ namespace shoverand {
 					status_host__ = new ParameterizedStatusType();
 					status_host__->setUp(block_num);
 
-					cutilSafeCall( cudaMalloc((void**) &status_device__, sizeof(ParameterizedStatusType)) );  
-					cutilSafeCall( cudaMemcpy(status_device__, status_host__, sizeof(ParameterizedStatusType), cudaMemcpyHostToDevice) );
+					myCutilSafeCall( cudaMalloc((void**) &status_device__, sizeof(ParameterizedStatusType)) );  
+					myCutilSafeCall( cudaMemcpy(status_device__, status_host__, sizeof(ParameterizedStatusType), cudaMemcpyHostToDevice) );
 										
 					// call the hack kernel with only one thread to copy the array's address
 					fillParameterizedStatus<<<1,1>>> (status_device__);
@@ -119,7 +118,7 @@ namespace shoverand {
 					}
 					
 					// wait until preceeding kernel to complete
-					cutilSafeCall( cudaDeviceSynchronize() );
+					myCutilSafeCall( cudaDeviceSynchronize() );
 				}
 				
 				/** Release resources allocated by init */
@@ -128,7 +127,7 @@ namespace shoverand {
 					status_host__->shutdown();
 					delete status_host__;
 					
-					cutilSafeCall(cudaFree(status_device__));
+					myCutilSafeCall(cudaFree(status_device__));
 					
 				}
 				

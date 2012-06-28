@@ -13,6 +13,8 @@
 #include <shoverand/core/ParameterizedStatus.hxx>
 #include <shoverand/core/SeedStatus.hxx>
 
+#include <cuda.h>
+#include <shoverand/util/myCutil.h>
 #include "ParameterizedStatus.h"
 #include "SeedStatus.h"
 #include "utils.hxx"
@@ -131,8 +133,8 @@ namespace shoverand {
 					 status_host->setUp(block_num);
 
 					 ParameterizedStatusType*    status_device;
-					 cutilSafeCall( cudaMalloc((void**) &status_device, sizeof(ParameterizedStatusType) * block_num) );
-					 cutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(ParameterizedStatusType) * block_num, cudaMemcpyHostToDevice) );
+					 myCutilSafeCall( cudaMalloc((void**) &status_device, sizeof(ParameterizedStatusType) * block_num) );
+					 myCutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(ParameterizedStatusType) * block_num, cudaMemcpyHostToDevice) );
 
 					 delete [] status_host;
 
@@ -140,7 +142,7 @@ namespace shoverand {
 					 fillParameterizedStatus<<<1,1>>> (status_device);
 
 					 // wait until preceeding kernel to complete
-					 cutilSafeCall( cudaDeviceSynchronize() );
+					 myCutilSafeCall( cudaDeviceSynchronize() );
 				 }
 
 				 /** Release resources allocated by init */

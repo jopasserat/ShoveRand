@@ -15,7 +15,7 @@
 
 #include <stdio.h>
 #include <cuda.h>
-#include <cutil.h>
+#include <shoverand/util/myCutil.h>
 #include <stdint.h>
 #include <inttypes.h>
 #include <errno.h>
@@ -33,7 +33,7 @@ int get_suitable_block_num(int word_size, int thread_num, int large_size) {
     int max_block, max_block_mem, max_block_dev;
     int major, minor, ver;
 
-    CUDA_SAFE_CALL(cudaGetDeviceProperties(&dev, 0));
+    myCutilSafeCall(cudaGetDeviceProperties(&dev, 0));
     cuDeviceGet(&cuDevice, 0);
     cuDeviceComputeCapability(&major, &minor, cuDevice);
     max_block_mem = dev.sharedMemPerBlock / (large_size * word_size);
@@ -95,7 +95,7 @@ void make_kernel_data(mtgp32_kernel_status_t *d_status,
    printf("h_status[2].status[2]:%08x\n", h_status[2].status[2]);
    printf("h_status[2].status[3]:%08x\n\n", h_status[2].status[3]);
 #endif
-   CUDA_SAFE_CALL(cudaMemcpy(d_status,
+   myCutilSafeCall(cudaMemcpy(d_status,
                              h_status,
                              sizeof(mtgp32_kernel_status_t) * block_num,
                              cudaMemcpyHostToDevice));

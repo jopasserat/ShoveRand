@@ -7,8 +7,6 @@
 
 
 #include <cuda.h>
-#include <cutil.h>
-#include <cutil_inline_runtime.h>
 
 #include "Stream.h"
 #include "ParameterizedStatus.h"

@@ -3,8 +3,7 @@
 #include "Stream.h"
  
 #include <cuda.h>
-#include <cutil.h>
-#include <cutil_inline_runtime.h>
+#include <shoverand/util/myCutil.h>
 
 	
 /******** Host equivalents to device constants *********/
@@ -92,27 +91,27 @@ void ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: setUp (unsigned
 			Stream* allStreams_host = new shoverand::prng::MRG32k3a::Stream [blocksNumber];
 	
 			// allocate memory for streams on the device
-			cutilSafeCall( cudaMalloc( (void**)&allStreams_, sizeof(shoverand::prng::MRG32k3a::Stream) * blocksNumber) );
+			myCutilSafeCall( cudaMalloc( (void**)&allStreams_, sizeof(shoverand::prng::MRG32k3a::Stream) * blocksNumber) );
 			// transfer Streams
-			cutilSafeCall( cudaMemcpy( allStreams_,
+			myCutilSafeCall( cudaMemcpy( allStreams_,
 												allStreams_host,
 												sizeof(shoverand::prng::MRG32k3a::Stream) * blocksNumber,
 												cudaMemcpyHostToDevice) );
 
 			// allocate and copy from host to device matrices
-			cutilSafeCall( cudaMalloc((void**) &A1p76_, sizeof(double) * 9) );
-			cutilSafeCall( cudaMemcpy(A1p76_, A1p76_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
-			cutilSafeCall( cudaMalloc((void**) &A2p76_, sizeof(double) * 9) );
-			cutilSafeCall( cudaMemcpy(A2p76_, A2p76_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
-			cutilSafeCall( cudaMalloc((void**) &A1p127_, sizeof(double) * 9) );
-			cutilSafeCall( cudaMemcpy(A1p127_, A1p127_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
-			cutilSafeCall( cudaMalloc((void**) &A2p127_, sizeof(double) * 9) );
-			cutilSafeCall( cudaMemcpy(A2p127_, A2p127_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
+			myCutilSafeCall( cudaMalloc((void**) &A1p76_, sizeof(double) * 9) );
+			myCutilSafeCall( cudaMemcpy(A1p76_, A1p76_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
+			myCutilSafeCall( cudaMalloc((void**) &A2p76_, sizeof(double) * 9) );
+			myCutilSafeCall( cudaMemcpy(A2p76_, A2p76_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
+			myCutilSafeCall( cudaMalloc((void**) &A1p127_, sizeof(double) * 9) );
+			myCutilSafeCall( cudaMemcpy(A1p127_, A1p127_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
+			myCutilSafeCall( cudaMalloc((void**) &A2p127_, sizeof(double) * 9) );
+			myCutilSafeCall( cudaMemcpy(A2p127_, A2p127_host, sizeof(double) * 9, cudaMemcpyHostToDevice ) );
 			
-			cutilSafeCall( cudaMalloc((void**) &A1_pows_, sizeof(double) * 11 * 3 * 3) );
-			cutilSafeCall( cudaMemcpy(A1_pows_, A1_pows_host, sizeof(double) * 11 * 3 * 3, cudaMemcpyHostToDevice ) );
-			cutilSafeCall( cudaMalloc((void**) &A2_pows_, sizeof(double) * 11 * 3 * 3) );
-			cutilSafeCall( cudaMemcpy(A2_pows_, A2_pows_host, sizeof(double) * 11 * 3 * 3, cudaMemcpyHostToDevice ) );
+			myCutilSafeCall( cudaMalloc((void**) &A1_pows_, sizeof(double) * 11 * 3 * 3) );
+			myCutilSafeCall( cudaMemcpy(A1_pows_, A1_pows_host, sizeof(double) * 11 * 3 * 3, cudaMemcpyHostToDevice ) );
+			myCutilSafeCall( cudaMalloc((void**) &A2_pows_, sizeof(double) * 11 * 3 * 3) );
+			myCutilSafeCall( cudaMemcpy(A2_pows_, A2_pows_host, sizeof(double) * 11 * 3 * 3, cudaMemcpyHostToDevice ) );
 
 			delete [] allStreams_host;
 }
@@ -120,11 +119,11 @@ void ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: setUp (unsigned
 __host__
 void ParameterizedStatus<shoverand::prng::MRG32k3a::MRG32k3a> :: shutdown() {
 
-	cutilSafeCall( cudaFree(A2_pows_) );
-	cutilSafeCall( cudaFree(A1_pows_) );
-	cutilSafeCall( cudaFree(A2p127_) );
-	cutilSafeCall( cudaFree(A1p127_) );
-	cutilSafeCall( cudaFree(A2p76_) );
-	cutilSafeCall( cudaFree(A1p76_) );
-	cutilSafeCall( cudaFree(allStreams_) );
+	myCutilSafeCall( cudaFree(A2_pows_) );
+	myCutilSafeCall( cudaFree(A1_pows_) );
+	myCutilSafeCall( cudaFree(A2p127_) );
+	myCutilSafeCall( cudaFree(A1p127_) );
+	myCutilSafeCall( cudaFree(A2p76_) );
+	myCutilSafeCall( cudaFree(A1p76_) );
+	myCutilSafeCall( cudaFree(allStreams_) );
 }
