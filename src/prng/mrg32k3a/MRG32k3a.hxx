@@ -29,7 +29,7 @@ namespace shoverand {
 			 *  DO NOT USE IT directly!
 			 * */
 			__device__
-			ParameterizedStatusMRG32k3a* ps_;
+			ParameterizedStatusMRG32k3a* paramArray;
 			
 			
 			/** This kernel is a hack to avoid the user to pass ParameterizedStatus 
@@ -40,7 +40,7 @@ namespace shoverand {
 			__global__
 			static void fillParameterizedStatus(ParameterizedStatusMRG32k3a* inStatus) {
 				if (threadIdx.x == 0) {
-					ps_ = inStatus;
+					paramArray = inStatus;
 				}
 			}
 			
@@ -71,6 +71,7 @@ namespace shoverand {
 				static ParameterizedStatusType* status_host__;
 				static ParameterizedStatusType* status_device__;
 				SeedStatusType ss_;
+				ParameterizedStatusType* ps_;
 									
 				long k;
 				double p1, p2, u;
@@ -82,8 +83,9 @@ namespace shoverand {
 				MRG32k3a(int foo) {}
 				
 				__device__
-				MRG32k3a() {
-					//ss_ = new SeedStatusMRG32k3a(ps_);
+				MRG32k3a()
+					:ps_ (paramArray)
+				{
 					ss_.setUp(ps_);
 				}
 				
