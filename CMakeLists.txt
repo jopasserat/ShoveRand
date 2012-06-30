@@ -94,3 +94,4 @@ CUDA_ADD_EXECUTABLE( test-shoverand
                      ${SHOVERAND_TEST_SOURCES}
                   )
 
+target_link_libraries ( test-shoverand shoverand )
