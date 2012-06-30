@@ -1,5 +1,5 @@
 /**
- * @file utils.cxx
+ * @file util.cxx
  *
  * @brief utility program for CUDA implementation of TinyMT.
  *
@@ -22,7 +22,7 @@
 #include <cstring>
 
 namespace shoverand {
-	namespace utils {
+	namespace util {
 	
 		/**
 		* This function reads parameter from file and puts them in an array.
@@ -119,5 +119,5 @@ namespace shoverand {
 			return 0;
 		}
 
-	} // end of namespace utils
+	} // end of namespace util
 } // end of namespace shoverand

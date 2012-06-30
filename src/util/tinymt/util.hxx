@@ -1,5 +1,5 @@
 /**
- * @file utils.hxx
+ * @file util.hxx
  *
  * @brief utility program for CUDA implementation of TinyMT.
  *
@@ -17,14 +17,14 @@
  * Modified by jH@CKtheRipper, 11/3/11
  */
 
-#ifndef UTILS_HXX
-#define UTILS_HXX
+#ifndef UTIL_HXX
+#define UTIL_HXX
 
 // TODO: try to provide FILE from another way than including the whole cstdio
 #include <cstdio>
 
 namespace shoverand {
-	namespace utils {
+	namespace util {
 		
 		template <class UINT_TYPE>
 		struct TinyMT {
@@ -66,10 +66,10 @@ namespace shoverand {
 		static int readLine(UINT_TYPE* mat1, UINT_TYPE* mat2, UINT_TYPE* tmat, FILE *fp);
 		
 		};
-	} // end of namespace utils
+	} // end of namespace util
 } // end of namespace shoverand
 
 
-#include "utils.cxx"
+#include "util.cxx"
 
-#endif // UTILS_HXX
+#endif // UTIL_HXX
