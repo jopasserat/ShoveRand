@@ -1,6 +1,5 @@
 
 #include "ParameterizedStatus.h"
-#include "Stream.h"
 
 #include <cuda.h>
 #include <shoverand/util/myCutil.h>
