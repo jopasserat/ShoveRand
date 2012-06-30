@@ -55,6 +55,7 @@ include( boost.cmake )
 set( SHOVERAND_SOURCES
    src/prng/mrg32k3a/Stream.cu
    src/prng/mrg32k3a/ParameterizedStatus.cu
+   src/prng/tinymt/ParameterizedStatus.cu
 )
 
 set( SHOVERAND_HEADERS
@@ -64,8 +65,8 @@ set( SHOVERAND_HEADERS
    src/core/ParameterizedStatus.hxx
    src/core/RNG.hxx
    src/prng/tinymt/TinyMT.hxx
-   src/prng/tinymt/utils.hxx
    src/prng/mrg32k3a/MRG32k3a.hxx
+   src/util/tinymt/utils.hxx
 #
 #  Headers (template specializations)
    src/prng/tinymt/ParameterizedStatus.h
@@ -74,6 +75,7 @@ set( SHOVERAND_HEADERS
    src/prng/mrg32k3a/ParameterizedStatus.h
    src/prng/mrg32k3a/SeedStatus.h
    src/prng/mrg32k3a/utils.h
+   src/util/myCutil.h
 )
 
 set( SHOVERAND_TEST_SOURCES
