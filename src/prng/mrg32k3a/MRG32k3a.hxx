@@ -19,7 +19,7 @@
 
 #include "ParameterizedStatus.h"
 #include "SeedStatus.h"
-#include "utils.h"
+#include <shoverand/util/mrg32k3a/util.h>
 
 namespace shoverand {
 	namespace prng {	

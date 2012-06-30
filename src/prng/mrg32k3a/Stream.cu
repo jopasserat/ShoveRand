@@ -10,7 +10,7 @@
 
 #include "Stream.h"
 #include "ParameterizedStatus.h"
-#include "utils.h" // TODO move to details
+#include <shoverand/util/mrg32k3a/util.h>
 
 namespace shoverand {
 	namespace prng {
@@ -42,8 +42,8 @@ namespace shoverand {
 					Cg_[i] = nextSeed__[i];
 				}
 
-				shoverand::utils::Math::MatVecModM (ParameterizedStatusMRG32k3a::A1p127_host, nextSeed__, nextSeed__, m1);
-				shoverand::utils::Math::MatVecModM (ParameterizedStatusMRG32k3a::A2p127_host, &nextSeed__[3], &nextSeed__[3], m2);
+				shoverand::util::mrg32k3a::Math::MatVecModM (ParameterizedStatusMRG32k3a::A1p127_host, nextSeed__, nextSeed__, m1);
+				shoverand::util::mrg32k3a::Math::MatVecModM (ParameterizedStatusMRG32k3a::A2p127_host, &nextSeed__[3], &nextSeed__[3], m2);
 
 			}
 

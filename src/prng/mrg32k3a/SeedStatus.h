@@ -5,7 +5,7 @@
 
 #include "ParameterizedStatus.h"
 #include "Stream.h"
-#include "utils.h"
+#include <shoverand/util/mrg32k3a/util.h>
 
 
 // forward declaration of class MRG32k3a
@@ -72,11 +72,11 @@ namespace shoverand { namespace prng {	 namespace MRG32k3a {
 			};
 
 
-			shoverand::utils::Math::MatPowModM(params->A1p76_, A1_pN, m1, pow);  // (A1^(2^76))^n mod m
-			shoverand::utils::Math::MatPowModM(params->A2p76_, A2_pN, m2, pow);  // (A2^(2^76))^n mod m
+			shoverand::util::mrg32k3a::Math::MatPowModM(params->A1p76_, A1_pN, m1, pow);  // (A1^(2^76))^n mod m
+			shoverand::util::mrg32k3a::Math::MatPowModM(params->A2p76_, A2_pN, m2, pow);  // (A2^(2^76))^n mod m
 
-			shoverand::utils::Math::MatVecModM(A1_pN, Cg_, Cg_, m1);
-			shoverand::utils::Math::MatVecModM(A2_pN, &(Cg_[3]), &(Cg_[3]), m2);
+			shoverand::util::mrg32k3a::Math::MatVecModM(A1_pN, Cg_, Cg_, m1);
+			shoverand::util::mrg32k3a::Math::MatVecModM(A2_pN, &(Cg_[3]), &(Cg_[3]), m2);
 
 		}
 

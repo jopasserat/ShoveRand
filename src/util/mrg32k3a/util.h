@@ -1,5 +1,5 @@
 /*
- *  utils.h
+ *  util.h
  *  
  *
  *  Created by Jonathan PASSERAT-PALMBACH on 4/7/11.
@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef UTIL_H
+#define UTIL_H
 
 
 /** Some defines to spare constant memory... */
@@ -34,7 +34,8 @@
 
 
 namespace shoverand {
-	namespace utils {
+	namespace util {
+		namespace mrg32k3a {
 		
 		/** This structure owns static methods implied in random number computation.
 		 * They are basically dedicated to matrix calculi.
@@ -204,8 +205,9 @@ namespace shoverand {
 			}
 			
 		}; // end of struct Math
-	} // end of namepace utils
+		} // end of namespace mrg32k3a
+	} // end of namepace util
 } // end of namespace shoverand
 
 
-#endif // UTILS_H
+#endif // UTIL_H

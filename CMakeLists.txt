@@ -66,7 +66,7 @@ set( SHOVERAND_HEADERS
    src/core/RNG.hxx
    src/prng/tinymt/TinyMT.hxx
    src/prng/mrg32k3a/MRG32k3a.hxx
-   src/util/tinymt/utils.hxx
+   src/util/tinymt/util.hxx
 #
 #  Headers (template specializations)
    src/prng/tinymt/ParameterizedStatus.h
@@ -74,7 +74,7 @@ set( SHOVERAND_HEADERS
    src/prng/mrg32k3a/Stream.h
    src/prng/mrg32k3a/ParameterizedStatus.h
    src/prng/mrg32k3a/SeedStatus.h
-   src/prng/mrg32k3a/utils.h
+   src/util/mrg32k3a/util.h
    src/util/myCutil.h
 )
 
