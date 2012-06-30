@@ -33,6 +33,7 @@ public:
 	void shutdown();
 
 private:
+	/** Name of the file containing TinyMT's paramters */
 	static const std::string filename_;
 };
 

@@ -161,12 +161,12 @@ namespace shoverand {
 				//TODO The two following methods need to be tuned according to MRG32k3a's characteristics
 				// 	and also to its result type.
 				__host__ __device__ inline
-				result_type min() const { return result_type(0); }
+				result_type min() const { return static_cast<result_type>(0); }
 
 
 				// TODO specialize according to internal data type
 				__host__ __device__ inline
-				result_type max() const { return result_type(1); }
+				result_type max() const { return static_cast<result_type>(1); }
 				
 
 				__host__ __device__ inline
