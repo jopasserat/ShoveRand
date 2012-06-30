@@ -17,7 +17,7 @@
 #include <shoverand/util/myCutil.h>
 #include "ParameterizedStatus.h"
 #include "SeedStatus.h"
-#include "utils.hxx"
+#include <shoverand/util/tinymt/util.hxx>
 
 namespace shoverand {
 	namespace prng {	
@@ -68,10 +68,12 @@ namespace shoverand {
 
 
 			private:
-				ParameterizedStatusType ps_;
-
+				ParameterizedStatusType* ps_;
 				SeedStatusType ss_;
 
+				// parameters array memento
+				static ParameterizedStatusType* status_host_;
+				static ParameterizedStatusType* status_device_;
 
 			private:
 				__host__ __device__ void nextRN() {
@@ -86,8 +88,8 @@ namespace shoverand {
 					ss_.status2_ = x ^ (y << TINYMT32_SHIFT1);
 					ss_.status3_ = y;
 					if (y & 1) {
-						ss_.status1_ ^= ps_.mat1;
-						ss_.status2_ ^= ps_.mat2;
+						ss_.status1_ ^= ps_->mat1_;
+						ss_.status2_ ^= ps_->mat2_;
 					}
 				}
 
@@ -97,7 +99,7 @@ namespace shoverand {
 					t1 = ss_.status0_ + (ss_.status2_ >> 8);
 					t0 ^= t1;
 					if (t1 & 1) {
-						t0 ^= ps_.tmat;
+						t0 ^= ps_->tmat_;
 					}
 					return t0;
 
@@ -114,7 +116,7 @@ namespace shoverand {
 				 */
 				 __host__ __device__
 				 TinyMT()
-				//:ps_(paramArray + (blockIdx.x * blockDim.y + blockIdx.y) ) // TODO
+				 	 :ps_(paramArray + (blockIdx.x * blockDim.y + blockIdx.y) )
 				{
 					 //ss_.setUp(ps_); // not needed yet
 				}
@@ -129,17 +131,17 @@ namespace shoverand {
 				 static void init(unsigned int block_num) {
 
 					 // ParameterizedStatus initialization on both sides
-					 ParameterizedStatusType* 	 status_host = new ParameterizedStatusType[block_num];
-					 status_host->setUp(block_num);
+					 status_host_ = new ParameterizedStatusType[block_num];
 
-					 ParameterizedStatusType*    status_device;
-					 myCutilSafeCall( cudaMalloc((void**) &status_device, sizeof(ParameterizedStatusType) * block_num) );
-					 myCutilSafeCall( cudaMemcpy(status_device, status_host, sizeof(ParameterizedStatusType) * block_num, cudaMemcpyHostToDevice) );
+					 for (int i = 0; i < block_num; ++i) {
+						 status_host_[i].setUp(i);
+					 }
 
-					 delete [] status_host;
+					 myCutilSafeCall( cudaMalloc((void**) &status_device_, sizeof(ParameterizedStatusType) * block_num) );
+					 myCutilSafeCall( cudaMemcpy(status_device_, status_host_, sizeof(ParameterizedStatusType) * block_num, cudaMemcpyHostToDevice) );
 
 					 // call the hack kernel with only one thread to copy the array's address
-					 fillParameterizedStatus<<<1,1>>> (status_device);
+					 fillParameterizedStatus<<<1,1>>> (status_device_);
 
 					 // wait until preceeding kernel to complete
 					 myCutilSafeCall( cudaDeviceSynchronize() );
@@ -148,7 +150,10 @@ namespace shoverand {
 				 /** Release resources allocated by init */
 				 __host__
 				 static void release() {
-					 // TODO
+					 status_host_->shutdown();
+					 delete [] status_host_;
+
+					 myCutilSafeCall( cudaFree( status_device_ ));
 				 }
 
 				 __host__ __device__
@@ -177,6 +182,12 @@ namespace shoverand {
 				 friend class RNGAlgorithm;
 
 			};
+
+			template <class T>
+			ParameterizedStatusTinyMT* TinyMT<T>::status_host_;
+
+			template <class T>
+			ParameterizedStatusTinyMT* TinyMT<T>::status_device_;
 
 		} // end of namespace TinyMT
 	} // end of namespace prng

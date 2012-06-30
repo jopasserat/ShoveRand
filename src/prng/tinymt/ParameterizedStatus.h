@@ -2,6 +2,7 @@
 #define TINYMT_PARAMETERIZED_STATUS
 
 #include <shoverand/core/ParameterizedStatus.hxx>
+#include <string>
 
 // forward declaration of MRG32k3a class
 namespace shoverand {
@@ -18,17 +19,21 @@ namespace shoverand {
 template <>
 class ParameterizedStatus<shoverand::prng::TinyMT::TinyMT> {
 public:
-	unsigned int mat1;
-	unsigned int mat2;
-	unsigned int tmat;
+	unsigned int mat1_;
+	unsigned int mat2_;
+	unsigned int tmat_;
 
 
 public:
 
 	__host__
-	void setUp(unsigned int inBlockNum) {
-		// TODO
-	}
+	void setUp(unsigned short inBlockId);
+
+	__host__
+	void shutdown();
+
+private:
+	static const std::string filename_;
 };
 
 namespace shoverand {
