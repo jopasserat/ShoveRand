@@ -26,5 +26,9 @@ following cmake process.
 
 ## Usage ##
 
-A simple example of how to use Shoverand can be found in `test/test-shoverand.cu`.  
+A simple example of how to use Shoverand can be found in `example/montecarlo/montecarlo_pi.cu` and `test/test-shoverand.cu`.
 When using Shoverand in your own project, **do not forget to link against the `libshoverand.so`** library that is built in the `lib/` directory.
+
+You can also find an example showing how to integrate a PRNG in shoverand in `example/dummy_generator/dummy_generator.hxx`.
+
+These examples were presented as a tutorial at the HPCS 2012 conference, in Madrid (http://hpcs2012.cisedu.info/4-program/tutorials  ==> T4). 
