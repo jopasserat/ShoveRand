@@ -18,11 +18,11 @@ using shoverand::RNG;
 using shoverand::MRG32k3a;
 using shoverand::TinyMT;
 
-typedef RNG < float, MRG32k3a > rng_type;
+typedef RNG < double, MRG32k3a > rng_type;
 
 
 /** Kernel testing PRNG implementations */
-__global__ void testPRNG(double* ddata) {
+__global__ void testPRNG(double* ddata, int inNbDataPerThread) {
 
 	// this call might not work with devices of
 	// compute capability < 2.x
@@ -30,8 +30,9 @@ __global__ void testPRNG(double* ddata) {
 
 	// TODO old devices compliant version
 
-	ddata[blockDim.x * blockIdx.x + threadIdx.x] = rng.next();
-	__syncthreads();
+	for (int i = 0; i < inNbDataPerThread; ++i) {
+		ddata[inNbDataPerThread * (blockDim.x * blockIdx.x + threadIdx.x) + i] = rng.next();
+	}
 }
 
 
@@ -67,9 +68,11 @@ int main(int, char **) {
 	cudaMemGetInfo(&memFree, &memTotal);
 	std :: cerr << "Available device memory at the beginning: " << memFree << "/" << memTotal << std::endl;
 
-	int block_num = 3;
-	int thread_num = 512;
-	int data_size = block_num * thread_num * sizeof(double);
+	int nbDataPerThread = 100;
+	int blockNum = 512;
+	int threadNum = 512;
+	int nbData = nbDataPerThread * blockNum * threadNum;
+	int dataSize = nbData * sizeof(double);
 
 	double* d_data;
 	double* h_data;
@@ -85,8 +88,8 @@ int main(int, char **) {
 
 
 	// allocate memory for data on device
-	myCutilSafeCall( cudaMalloc((void**) &d_data, data_size) );
-	myCutilSafeCall( cudaMemset(d_data, 0, data_size) );
+	myCutilSafeCall( cudaMalloc((void**) &d_data, dataSize) );
+	myCutilSafeCall( cudaMemset(d_data, 0, dataSize) );
 
 
 	if (cudaGetLastError() != cudaSuccess) {
@@ -95,14 +98,14 @@ int main(int, char **) {
 	}
 
 	// init step from host side
-	rng_type ::init(block_num);
+	rng_type ::init(blockNum);
 
 	cudaEventRecord(start, 0);
 
 
 	// --- kernel calls ---
 	//	testVariateGenerator<<< block_num, thread_num >>>(d_data);
-	testPRNG<<< block_num, thread_num >>>(d_data);
+	testPRNG<<< blockNum, threadNum >>>(d_data, nbDataPerThread);
 
 	cudaEventRecord(stop, 0);
 	cudaEventSynchronize(stop);
@@ -114,7 +117,7 @@ int main(int, char **) {
 	}
 
 	// allocate memory to get results back on the host
-	h_data = new double[data_size];
+	h_data = new double[dataSize];
 
 	if (h_data == NULL) {
 		std::cerr << "failure in allocating host memory for output data." << std::endl;
@@ -124,19 +127,19 @@ int main(int, char **) {
 	myCutilSafeCall(
 			cudaMemcpy(h_data,
 					d_data,
-					data_size,
+					dataSize,
 					cudaMemcpyDeviceToHost));
 	cudaEventElapsedTime(&gputime, start, stop);
 
 
-	for (int i = 0; i < block_num * thread_num; ++i) {
+	for (int i = 0; i < nbData; ++i) {
 		std::cout << "h_data[" << i << "] = " << h_data[i] << std::endl;
 	}
 
 
-	std::cout << "generated numbers: " << thread_num * block_num << std::endl;
+	std::cout << "generated numbers: " << nbData << std::endl;
 	std::cout << "Processing time: " << gputime << " (ms)" << std::endl;
-	std::cout << "Samples per second: " << (thread_num * block_num) / (gputime * 0.001) << std::endl;
+	std::cout << "Samples per second: " << nbData / (gputime * 0.001) << std::endl;
 
 	//free memory
 	cudaEventDestroy(start);
