@@ -30,12 +30,12 @@ include_directories( ${CUDA_SDK_ROOT_DIR}/common/inc )
 # include shoverand's self directory
 include_directories( "." )
 
-# 1.0
-#SET( CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-arch=sm_10" )
-# 1.3
-#SET( CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-arch=sm_13" )
-# 2.0
-SET( CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-arch=sm_20" )
+# set default target architecture to 2.0
+if ( NOT CUDA_ARCH )
+   SET( CUDA_ARCH "-arch=sm_20" )
+endif()
+
+SET( CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} ${CUDA_ARCH} )
 
 option ( PTXAS_OPTION "Activate --ptxas-options=-v option." OFF )
 if ( PTXAS_OPTION )
@@ -97,3 +97,6 @@ CUDA_ADD_EXECUTABLE( test-shoverand
                   )
 
 target_link_libraries ( test-shoverand shoverand )
+
+ENABLE_TESTING()
+ADD_TEST ( Shoverand_Test_Battery ${EXECUTABLE_OUTPUT_PATH}/test-shoverand )
